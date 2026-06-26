@@ -305,11 +305,12 @@ function renderGeneralPreview() {
   const color  = $('gAccentColor').value || '#9900ff';
   const ping   = $('gPingEveryone').checked;
   const footer = $('gFooter').value.trim();
+  const header = $('gHeader').value.trim();
   const avatarHtml = window._botAvatar ? `<img src="${esc(window._botAvatar)}" alt="avatar">` : (window._botName??'A').charAt(0).toUpperCase();
   const botName = window._botName ?? 'Announce';
   const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
-  let innerHtml = '';
+  let innerHtml = header ? `<div class="cv2-text"><h2>${esc(header)}</h2></div>` : '';
   let belowHtml = '';
 
   gBlocks.forEach(block => {
@@ -364,7 +365,7 @@ function renderGeneralPreview() {
 }
 
 // wire general top-level inputs to preview
-['gFooter','gAccentColor','gPingEveryone'].forEach(id => {
+['gHeader','gFooter','gAccentColor','gPingEveryone'].forEach(id => {
   $(id).addEventListener('input',  renderGeneralPreview);
   $(id).addEventListener('change', renderGeneralPreview);
 });
@@ -474,6 +475,7 @@ $('sendBtn').addEventListener('click', async () => {
         body: JSON.stringify({
           channelId:    $('gChannelId').value,
           pingEveryone: $('gPingEveryone').checked,
+          header:       $('gHeader').value.trim(),
           footer:       $('gFooter').value.trim(),
           accentColor:  $('gAccentColor').value,
           blocks:       gBlocks,

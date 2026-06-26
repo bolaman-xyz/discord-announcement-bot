@@ -235,6 +235,9 @@ async function sendGeneralAnnouncement(channelId, data) {
   const container = new ContainerBuilder().setAccentColor(color);
   const belowComponents = [];
 
+  if (data.header?.trim())
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${data.header.trim()}`));
+
   for (const block of (data.blocks ?? [])) {
     switch (block.type) {
       case 'text':
