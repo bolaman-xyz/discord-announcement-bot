@@ -306,6 +306,12 @@ async function sendGeneralAnnouncement(channelId, data) {
   if (data.footer?.trim())
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${data.footer.trim()}`));
 
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setLabel('Website').setURL('https://odservices.cc/').setStyle(ButtonStyle.Link).setEmoji('🔗'),
+    ),
+  );
+
   const components = [];
   if (data.pingEveryone) components.push(new TextDisplayBuilder().setContent('@everyone'));
   components.push(container);
