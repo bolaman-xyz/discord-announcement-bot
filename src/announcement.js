@@ -64,14 +64,6 @@ function buildAnnouncementComponents(data, lang = 'en', flagEmojis = {}) {
     );
   }
 
-  const components = [];
-
-  if (data.pingEveryone) {
-    components.push(new TextDisplayBuilder().setContent('@everyone'));
-  }
-
-  components.push(container);
-
   const buttonRow = new ActionRowBuilder().addComponents(
     ...LANG_BUTTONS.map(({ id }) => {
       const button = new ButtonBuilder()
@@ -93,7 +85,15 @@ function buildAnnouncementComponents(data, lang = 'en', flagEmojis = {}) {
     }),
   );
 
-  components.push(buttonRow);
+  container.addActionRowComponents(buttonRow);
+
+  const components = [];
+
+  if (data.pingEveryone) {
+    components.push(new TextDisplayBuilder().setContent('@everyone'));
+  }
+
+  components.push(container);
 
   return {
     components,
