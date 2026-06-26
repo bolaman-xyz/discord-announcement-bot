@@ -231,7 +231,6 @@ async function loadSettings() {
   $('tokenHint').textContent  = s.hasToken
     ? `Saved token: ${s.maskedToken}`
     : 'No token saved yet.';
-  setFormData(s.defaults ?? {});
 }
 
 $('saveSettingsBtn').addEventListener('click', async () => {
