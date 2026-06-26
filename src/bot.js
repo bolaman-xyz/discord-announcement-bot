@@ -225,35 +225,91 @@ async function sendAnnouncement(channelId, data) {
 async function sendGeneralAnnouncement(channelId, data) {
   if (!client?.isReady()) throw new Error('Bot is not connected.');
 
-  const { ContainerBuilder, TextDisplayBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder, MessageFlags } = require('discord.js');
+  const {
+    ContainerBuilder, TextDisplayBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder,
+    SeparatorBuilder, SeparatorSpacingSize, SectionBuilder, ThumbnailBuilder,
+    ActionRowBuilder, ButtonBuilder, ButtonStyle, FileBuilder, MessageFlags,
+  } = require('discord.js');
 
   const color = parseInt((data.accentColor ?? '#9900ff').replace('#', ''), 16);
   const container = new ContainerBuilder().setAccentColor(color);
+  const belowComponents = [];
 
-  if (data.title?.trim()) {
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${data.title.trim()}`));
+  for (const block of (data.blocks ?? [])) {
+    switch (block.type) {
+      case 'text':
+        if (block.content?.trim())
+          container.addTextDisplayComponents(new TextDisplayBuilder().setContent(block.content.trim()));
+        break;
+
+      case 'section': {
+        const section = new SectionBuilder()
+          .addTextDisplayComponents(new TextDisplayBuilder().setContent(block.text?.trim() || '​'));
+        if (block.imageUrl?.trim())
+          section.setThumbnailAccessory(new ThumbnailBuilder().setURL(block.imageUrl.trim()));
+        container.addSectionComponents(section);
+        break;
+      }
+
+      case 'media': {
+        const urls = (block.urls ?? []).filter(u => u?.trim());
+        if (urls.length) {
+          const gallery = new MediaGalleryBuilder();
+          urls.forEach(u => gallery.addItems(new MediaGalleryItemBuilder().setURL(u.trim())));
+          container.addMediaGalleryComponents(gallery);
+        }
+        break;
+      }
+
+      case 'separator':
+        container.addSeparatorComponents(
+          new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small),
+        );
+        break;
+
+      case 'action_list': {
+        const btns = (block.buttons ?? []).filter(b => b.label?.trim() && b.url?.trim());
+        if (btns.length) {
+          const row = new ActionRowBuilder().addComponents(
+            ...btns.map(b => new ButtonBuilder().setLabel(b.label.trim()).setURL(b.url.trim()).setStyle(ButtonStyle.Link)),
+          );
+          container.addActionRowComponents(row);
+        }
+        break;
+      }
+
+      case 'file':
+        if (block.url?.trim()) {
+          const file = new FileBuilder().setURL(block.url.trim());
+          if (block.name?.trim()) file.setFilename(block.name.trim());
+          container.addFileComponents(file);
+        }
+        break;
+
+      case 'buttons': {
+        const btns = (block.buttons ?? []).filter(b => b.label?.trim() && b.url?.trim());
+        if (btns.length) {
+          belowComponents.push(new ActionRowBuilder().addComponents(
+            ...btns.map(b => new ButtonBuilder().setLabel(b.label.trim()).setURL(b.url.trim()).setStyle(ButtonStyle.Link)),
+          ));
+        }
+        break;
+      }
+    }
   }
-  if (data.message?.trim()) {
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`\`\`\`\n${data.message.trim()}\n\`\`\``));
-  }
-  if (data.imageUrl?.trim()) {
-    container.addMediaGalleryComponents(
-      new MediaGalleryBuilder().addItems(new MediaGalleryItemBuilder().setURL(data.imageUrl.trim())),
-    );
-  }
-  if (data.footer?.trim()) {
+
+  if (data.footer?.trim())
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${data.footer.trim()}`));
-  }
 
   const components = [];
   if (data.pingEveryone) components.push(new TextDisplayBuilder().setContent('@everyone'));
   components.push(container);
+  belowComponents.forEach(c => components.push(c));
 
   const channel = await client.channels.fetch(channelId);
   if (!channel?.isTextBased()) throw new Error('That channel is not a text channel.');
 
   const message = await channel.send({ components, flags: MessageFlags.IsComponentsV2 });
-
   return { messageId: message.id, channelId: channel.id, channelName: channel.name };
 }
 

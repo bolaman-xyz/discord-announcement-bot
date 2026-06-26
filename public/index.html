@@ -47,30 +47,22 @@
 
   <!-- BUILD PAGE -->
   <section class="page active" id="buildPanel">
-
-    <!-- Form -->
     <div class="form-panel">
-
       <div class="field">
         <label class="field-label">Channel</label>
-        <select id="channelId">
-          <option value="">Select a channel…</option>
-        </select>
+        <select id="channelId"><option value="">Select a channel…</option></select>
         <small>Load channels from Settings after saving your token and server ID.</small>
       </div>
-
       <div class="field">
         <label class="check-row">
           <input type="checkbox" id="pingEveryone" checked />
           Ping @everyone above the announcement
         </label>
       </div>
-
       <div class="field">
         <label class="field-label">Product</label>
         <input type="text" id="product" placeholder="e.g. Void External" />
       </div>
-
       <div class="field">
         <label class="field-label">Status</label>
         <div class="sdot-wrap">
@@ -83,22 +75,18 @@
           </select>
         </div>
       </div>
-
       <div class="field" style="display:none">
         <label class="field-label">Live status URL</label>
         <input type="url" id="statusUrl" value="https://odservices.cc/status" />
       </div>
-
       <div class="field">
         <label class="field-label">Changelog</label>
         <textarea id="changelog" rows="7" placeholder="- Added feature&#10;- Fixed bug"></textarea>
       </div>
-
       <div class="field">
         <label class="field-label">Banner image URL</label>
         <input type="url" id="imageUrl" placeholder="https://cdn.discordapp.com/..." />
       </div>
-
       <div class="row2">
         <div class="field">
           <label class="field-label">Footer (optional)</label>
@@ -109,81 +97,65 @@
           <input type="color" id="accentColor" value="#9900ff" />
         </div>
       </div>
-
     </div>
-
-    <!-- Preview -->
     <div class="preview-wrap">
-      <div class="preview-header">
-        <span>Live preview</span>
-        <span class="badge">V2</span>
-      </div>
+      <div class="preview-header"><span>Live preview</span><span class="badge">V2</span></div>
       <div id="preview"></div>
     </div>
-
   </section>
 
   <!-- GENERAL PAGE -->
   <section class="page" id="generalPanel">
+    <div class="form-panel" style="width:55%;min-width:340px">
 
-    <div class="form-panel">
-
+      <!-- Top options -->
       <div class="field">
         <label class="field-label">Channel</label>
-        <select id="gChannelId">
-          <option value="">Select a channel…</option>
-        </select>
+        <select id="gChannelId"><option value="">Select a channel…</option></select>
       </div>
-
       <div class="field">
         <label class="check-row">
           <input type="checkbox" id="gPingEveryone" checked />
           Ping @everyone above the announcement
         </label>
       </div>
-
-      <div class="field">
-        <label class="field-label">Title</label>
-        <input type="text" id="gTitle" placeholder="e.g. Important Update" />
-      </div>
-
-      <div class="field">
-        <label class="field-label">Message</label>
-        <textarea id="gMessage" rows="8" placeholder="Write your announcement here…"></textarea>
-      </div>
-
-      <div class="field">
-        <label class="field-label">Banner image URL</label>
-        <input type="url" id="gImageUrl" placeholder="https://cdn.discordapp.com/..." />
-      </div>
-
-      <div class="row2">
-        <div class="field">
+      <div class="row2" style="grid-template-columns:1fr auto;align-items:end">
+        <div class="field" style="margin:0">
           <label class="field-label">Footer (optional)</label>
           <input type="text" id="gFooter" placeholder="e.g. OD Services Updates" />
         </div>
-        <div class="field" style="align-items:flex-start">
+        <div class="field" style="align-items:flex-start;margin:0">
           <label class="field-label">Accent</label>
           <input type="color" id="gAccentColor" value="#9900ff" />
         </div>
       </div>
 
+      <!-- Block toolbar -->
+      <div class="block-toolbar">
+        <button class="block-add-btn" data-add="text">+ Text</button>
+        <button class="block-add-btn" data-add="section">+ Section</button>
+        <button class="block-add-btn" data-add="action_list">+ Action List</button>
+        <button class="block-add-btn" data-add="media">+ Media</button>
+        <button class="block-add-btn" data-add="file">+ File</button>
+        <button class="block-add-btn" data-add="separator">+ Separator</button>
+        <button class="block-add-btn" data-add="buttons">+ Buttons Below</button>
+        <button class="block-add-btn ghost" id="collapseAll">Collapse All</button>
+        <button class="block-add-btn ghost" id="expandAll">Expand All</button>
+      </div>
+
+      <!-- Blocks list -->
+      <div id="blocksContainer"></div>
+
     </div>
 
-    <!-- Preview -->
     <div class="preview-wrap">
-      <div class="preview-header">
-        <span>Live preview</span>
-        <span class="badge">V2</span>
-      </div>
+      <div class="preview-header"><span>Live preview</span><span class="badge">V2</span></div>
       <div id="gPreview"></div>
     </div>
-
   </section>
 
   <!-- SETTINGS PAGE -->
   <section class="page" id="settingsPanel">
-
     <div class="settings-card" id="envCard">
       <h2>Bot connection</h2>
       <p class="hint" id="envHint">Checking connection…</p>
@@ -207,7 +179,6 @@
         <button class="btn ghost" id="loadChannelsBtn">Reload channels</button>
       </div>
     </div>
-
   </section>
 
 </div>
