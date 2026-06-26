@@ -95,6 +95,7 @@ function attachHandlers(discordClient) {
     }
 
     try {
+      await interaction.deferReply({ ephemeral: true });
       const emojis = await resolveFlagEmojis();
       let payload;
       if (data._type === 'general') {
@@ -104,7 +105,7 @@ function attachHandlers(discordClient) {
         const translatedData = await translateAnnouncementData(data, langButton.lang);
         payload = buildAnnouncementComponents(translatedData, langButton.lang, emojis);
       }
-      await interaction.update(payload);
+      await interaction.editReply({ ...payload, ephemeral: true });
     } catch (error) {
       console.error(error);
       const reply = { content: 'Failed to update language.', ephemeral: true };
