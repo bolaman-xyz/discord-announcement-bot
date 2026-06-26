@@ -240,7 +240,7 @@ async function buildGeneralPayload(data, emojis) {
 
   const color = parseInt((data.accentColor ?? '#9900ff').replace('#', ''), 16);
   const container = new ContainerBuilder().setAccentColor(color);
-  const belowComponents = [];
+  const belowButtons = []; // all below-container link buttons collected here
 
   if (data.header?.trim())
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${data.header.trim()}`));
@@ -298,11 +298,9 @@ async function buildGeneralPayload(data, emojis) {
         break;
       case 'buttons': {
         const btns = (block.buttons ?? []).filter(b => b.label?.trim() && b.url?.trim());
-        if (btns.length) {
-          belowComponents.push(new ActionRowBuilder().addComponents(
-            ...btns.map(b => new ButtonBuilder().setLabel(b.label.trim()).setURL(b.url.trim()).setStyle(ButtonStyle.Link)),
-          ));
-        }
+        btns.forEach(b => belowButtons.push(
+          new ButtonBuilder().setLabel(b.label.trim()).setURL(b.url.trim()).setStyle(ButtonStyle.Link)
+        ));
         break;
       }
     }
@@ -324,15 +322,15 @@ async function buildGeneralPayload(data, emojis) {
     container.addActionRowComponents(flagRow);
   }
 
-  const websiteRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setLabel('Website').setURL('https://odservices.cc/').setStyle(ButtonStyle.Link).setEmoji('🔗'),
-  );
+  // Merge all below-container buttons into one row (Website first, then user buttons, max 5)
+  const websiteBtn = new ButtonBuilder().setLabel('Website').setURL('https://odservices.cc/').setStyle(ButtonStyle.Link).setEmoji('🔗');
+  const allBelowBtns = [websiteBtn, ...belowButtons].slice(0, 5);
+  const belowRow = new ActionRowBuilder().addComponents(...allBelowBtns);
 
   const components = [];
   if (data.pingEveryone) components.push(new TextDisplayBuilder().setContent('@everyone'));
   components.push(container);
-  belowComponents.forEach(c => components.push(c));
-  components.push(websiteRow);
+  components.push(belowRow);
 
   return { components, flags: MessageFlags.IsComponentsV2 };
 }

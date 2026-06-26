@@ -391,6 +391,7 @@ function renderGeneralPreview() {
   let innerHtml = header ? `<div class="cv2-text"><h2>${esc(header)}</h2></div>` : '';
   if (bannerUrl) innerHtml += `<div style="margin:6px 0 2px"><img src="${esc(bannerUrl)}" style="width:100%;border-radius:6px;display:block" /></div>`;
   let belowHtml = '';
+  const belowBtns = [];
 
   gBlocks.forEach(block => {
     switch (block.type) {
@@ -418,15 +419,16 @@ function renderGeneralPreview() {
         if (block.url) innerHtml += `<div class="cv2-file-preview">📎 ${esc(block.name||block.url)}</div>`;
         break;
       case 'buttons':
-        const bbtns = block.buttons.filter(b=>b.label);
-        if (bbtns.length) belowHtml += `<div class="flag-row" style="margin-top:4px">${bbtns.map(b=>`<div class="flag-btn" style="padding:4px 10px;font-size:12px;color:#dbdee1">${esc(b.label)}</div>`).join('')}</div>`;
+        block.buttons.filter(b=>b.label).forEach(b => belowBtns.push(b.label));
         break;
     }
   });
 
   if (footer) innerHtml += `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(footer)}</div>`;
   innerHtml += `<div class="flag-row" style="padding-top:4px">${['us','de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}</div>`;
-  belowHtml += `<div class="flag-row" style="margin-top:6px"><div class="flag-btn" style="padding:4px 12px;font-size:13px;color:#dbdee1">🔗 Website</div></div>`;
+  // Website + all buttons-below merged into one row
+  const allBelowLabels = ['🔗 Website', ...belowBtns];
+  belowHtml += `<div class="flag-row" style="margin-top:6px">${allBelowLabels.map(l=>`<div class="flag-btn" style="padding:4px 12px;font-size:13px;color:#dbdee1">${esc(l)}</div>`).join('')}</div>`;
 
   $('gPreview').innerHTML = `
     <div class="msg-row">
