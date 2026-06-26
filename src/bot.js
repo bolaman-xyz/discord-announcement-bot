@@ -4,6 +4,7 @@ const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
 const { buildAnnouncementComponents, LANG_BUTTONS } = require('./announcement');
 const { ensureFlagEmojis, readCache, isComplete } = require('./flag-emojis');
 const { loadSettings } = require('./settings');
+const { translateAnnouncementData } = require('./translate');
 
 const STORE_PATH = path.join(__dirname, '..', 'data', 'announcements.json');
 
@@ -95,7 +96,8 @@ function attachHandlers(discordClient) {
 
     try {
       const emojis = await resolveFlagEmojis();
-      const payload = buildAnnouncementComponents(data, langButton.lang, emojis);
+      const translatedData = await translateAnnouncementData(data, langButton.lang);
+      const payload = buildAnnouncementComponents(translatedData, langButton.lang, emojis);
       await interaction.update(payload);
     } catch (error) {
       console.error(error);
