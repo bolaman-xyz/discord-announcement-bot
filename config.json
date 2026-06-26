@@ -1,0 +1,10 @@
+{
+  "product": "AimBetter CS2",
+  "status": "UNDETECTED",
+  "statusUrl": "https://example.com/status",
+  "changelog": "- Added Streamproof\n- Added China Hat\n- Added Crosshairs\n- Reworked ESP Preview",
+  "imageUrl": "https://i.imgur.com/placeholder.png",
+  "footer": "AimBetter Updates",
+  "accentColor": "#9900ff",
+  "pingEveryone": true
+}
