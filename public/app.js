@@ -70,7 +70,7 @@ function getFormData() {
     pingEveryone: $('pingEveryone').checked,
     product:      $('product').value.trim(),
     status:       $('status').value,
-    statusUrl:    $('statusUrl').value.trim(),
+    statusUrl:    'https://odservices.cc/status',
     changelog:    $('changelog').value.trim(),
     imageUrl:     $('imageUrl').value.trim(),
     footer:       $('footer').value.trim(),
@@ -245,7 +245,7 @@ $('saveSettingsBtn').addEventListener('click', async () => {
         defaults: {
           product:      $('product').value.trim(),
           status:       $('status').value,
-          statusUrl:    $('statusUrl').value.trim(),
+          statusUrl:    'https://odservices.cc/status',
           changelog:    $('changelog').value.trim(),
           imageUrl:     $('imageUrl').value.trim(),
           footer:       $('footer').value.trim(),
