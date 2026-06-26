@@ -246,8 +246,10 @@ async function sendGeneralAnnouncement(channelId, data) {
         break;
 
       case 'section': {
+        const sectionText = block.text?.trim();
+        if (!sectionText && !block.imageUrl?.trim()) break;
         const section = new SectionBuilder()
-          .addTextDisplayComponents(new TextDisplayBuilder().setContent(block.text?.trim() || '​'));
+          .addTextDisplayComponents(new TextDisplayBuilder().setContent(sectionText || '​'));
         if (block.imageUrl?.trim())
           section.setThumbnailAccessory(new ThumbnailBuilder().setURL(block.imageUrl.trim()));
         container.addSectionComponents(section);
