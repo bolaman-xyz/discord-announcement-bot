@@ -109,7 +109,7 @@ function renderPreview() {
 
   // Matches actual bot output: code block with Changelog: header
   const changelogBlock = d.changelog
-    ? `<pre>Changelog:\n${esc(d.changelog)}\n\nAny issues let us know 💖</pre>`
+    ? `<pre>${esc(d.changelog)}</pre>`
     : '';
 
   // Rendered markdown version shown under "Additional Information" label

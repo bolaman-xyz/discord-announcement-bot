@@ -25,8 +25,7 @@ function fieldBlock(label, value) {
 }
 
 function buildChangelogBlock(lang, changelog) {
-  const t = UI[lang] ?? UI.en;
-  return `\`\`\`\n${t.changelogHeader}\n${changelog}\n\n${t.closing}\n\`\`\``;
+  return `\`\`\`\n${changelog}\n\`\`\``;
 }
 
 function buildAnnouncementComponents(data, lang = 'en', flagEmojis = {}) {
