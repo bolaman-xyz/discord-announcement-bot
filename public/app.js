@@ -420,8 +420,8 @@ function renderGeneralPreview() {
   });
 
   if (footer) innerHtml += `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(footer)}</div>`;
-  innerHtml += `<div class="flag-row" style="padding-top:8px"><div class="flag-btn" style="padding:4px 12px;font-size:13px;color:#dbdee1">🔗 Website</div></div>`;
   innerHtml += `<div class="flag-row" style="padding-top:4px">${['us','de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}</div>`;
+  belowHtml += `<div class="flag-row" style="margin-top:6px"><div class="flag-btn" style="padding:4px 12px;font-size:13px;color:#dbdee1">🔗 Website</div></div>`;
 
   $('gPreview').innerHTML = `
     <div class="msg-row">
