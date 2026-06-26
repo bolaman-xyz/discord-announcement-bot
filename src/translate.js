@@ -42,4 +42,25 @@ async function translateAnnouncementData(data, lang) {
   return { ...data, product, changelog, footer };
 }
 
-module.exports = { translateText, translateAnnouncementData };
+async function translateGeneralData(data, lang) {
+  if (lang === 'en') return data;
+
+  const [header, footer] = await Promise.all([
+    translateText(data.header, lang),
+    translateText(data.footer, lang),
+  ]);
+
+  const blocks = await Promise.all((data.blocks ?? []).map(async (block) => {
+    if (block.type === 'text') {
+      return { ...block, content: await translateText(block.content, lang) };
+    }
+    if (block.type === 'section') {
+      return { ...block, text: await translateText(block.text, lang) };
+    }
+    return block;
+  }));
+
+  return { ...data, header, footer, blocks };
+}
+
+module.exports = { translateText, translateAnnouncementData, translateGeneralData };

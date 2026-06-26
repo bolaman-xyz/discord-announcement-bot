@@ -4,7 +4,7 @@ const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
 const { buildAnnouncementComponents, LANG_BUTTONS } = require('./announcement');
 const { ensureFlagEmojis, readCache, isComplete } = require('./flag-emojis');
 const { loadSettings } = require('./settings');
-const { translateAnnouncementData } = require('./translate');
+const { translateAnnouncementData, translateGeneralData } = require('./translate');
 
 const STORE_PATH = path.join(__dirname, '..', 'data', 'announcements.json');
 
@@ -96,8 +96,14 @@ function attachHandlers(discordClient) {
 
     try {
       const emojis = await resolveFlagEmojis();
-      const translatedData = await translateAnnouncementData(data, langButton.lang);
-      const payload = buildAnnouncementComponents(translatedData, langButton.lang, emojis);
+      let payload;
+      if (data._type === 'general') {
+        const translated = await translateGeneralData(data, langButton.lang);
+        payload = await buildGeneralPayload(translated, emojis);
+      } else {
+        const translatedData = await translateAnnouncementData(data, langButton.lang);
+        payload = buildAnnouncementComponents(translatedData, langButton.lang, emojis);
+      }
       await interaction.update(payload);
     } catch (error) {
       console.error(error);
@@ -224,9 +230,7 @@ async function sendAnnouncement(channelId, data) {
   };
 }
 
-async function sendGeneralAnnouncement(channelId, data) {
-  if (!client?.isReady()) throw new Error('Bot is not connected.');
-
+async function buildGeneralPayload(data, emojis) {
   const {
     ContainerBuilder, TextDisplayBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder,
     SeparatorBuilder, SeparatorSpacingSize, SectionBuilder, ThumbnailBuilder,
@@ -246,7 +250,6 @@ async function sendGeneralAnnouncement(channelId, data) {
         if (block.content?.trim())
           container.addTextDisplayComponents(new TextDisplayBuilder().setContent(block.content.trim()));
         break;
-
       case 'section': {
         const sectionText = block.text?.trim();
         if (!sectionText && !block.imageUrl?.trim()) break;
@@ -257,7 +260,6 @@ async function sendGeneralAnnouncement(channelId, data) {
         container.addSectionComponents(section);
         break;
       }
-
       case 'media': {
         const urls = (block.urls ?? []).filter(u => u?.trim());
         if (urls.length) {
@@ -267,24 +269,20 @@ async function sendGeneralAnnouncement(channelId, data) {
         }
         break;
       }
-
       case 'separator':
         container.addSeparatorComponents(
           new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small),
         );
         break;
-
       case 'action_list': {
         const btns = (block.buttons ?? []).filter(b => b.label?.trim() && b.url?.trim());
         if (btns.length) {
-          const row = new ActionRowBuilder().addComponents(
+          container.addActionRowComponents(new ActionRowBuilder().addComponents(
             ...btns.map(b => new ButtonBuilder().setLabel(b.label.trim()).setURL(b.url.trim()).setStyle(ButtonStyle.Link)),
-          );
-          container.addActionRowComponents(row);
+          ));
         }
         break;
       }
-
       case 'file':
         if (block.url?.trim()) {
           const file = new FileBuilder().setURL(block.url.trim());
@@ -292,7 +290,6 @@ async function sendGeneralAnnouncement(channelId, data) {
           container.addFileComponents(file);
         }
         break;
-
       case 'buttons': {
         const btns = (block.buttons ?? []).filter(b => b.label?.trim() && b.url?.trim());
         if (btns.length) {
@@ -314,15 +311,42 @@ async function sendGeneralAnnouncement(channelId, data) {
     ),
   );
 
+  if (emojis && Object.keys(emojis).length) {
+    const { LANG_BUTTONS } = require('./announcement');
+    const flagRow = new ActionRowBuilder().addComponents(
+      ...LANG_BUTTONS.map(({ id }) => {
+        const btn = new ButtonBuilder().setCustomId(id).setStyle(ButtonStyle.Secondary);
+        const e = emojis[id];
+        if (e?.id) btn.setEmoji({ id: e.id, name: e.name, animated: e.animated ?? false });
+        return btn;
+      }),
+    );
+    container.addActionRowComponents(flagRow);
+  }
+
   const components = [];
   if (data.pingEveryone) components.push(new TextDisplayBuilder().setContent('@everyone'));
   components.push(container);
   belowComponents.forEach(c => components.push(c));
 
+  return { components, flags: MessageFlags.IsComponentsV2 };
+}
+
+async function sendGeneralAnnouncement(channelId, data) {
+  if (!client?.isReady()) throw new Error('Bot is not connected.');
+
+  const emojis = await resolveFlagEmojis(true);
+  const { MessageFlags } = require('discord.js');
+
   const channel = await client.channels.fetch(channelId);
   if (!channel?.isTextBased()) throw new Error('That channel is not a text channel.');
 
-  const message = await channel.send({ components, flags: MessageFlags.IsComponentsV2 });
+  const payload = await buildGeneralPayload(data, emojis);
+  const message = await channel.send(payload);
+
+  announcementStore.set(message.id, { ...data, _type: 'general' });
+  saveStore(announcementStore);
+
   return { messageId: message.id, channelId: channel.id, channelName: channel.name };
 }
 
