@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Announce — V2 Components</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'gg sans', 'Noto Sans', system-ui, sans-serif;
+  background: #1e1f22; color: #dbdee1; font-size: 14px;
+  display: flex;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 160px; min-width: 160px;
+  background: #2b2d31; border-right: 1px solid #111214;
+  display: flex; flex-direction: column; height: 100vh;
+}
+.brand { padding: 16px 12px 14px; border-bottom: 1px solid #111214; }
+.brand-icon {
+  width: 34px; height: 34px; border-radius: 8px; background: #5865f2;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 8px;
+}
+.brand-name { font-size: 13px; font-weight: 700; color: #f2f3f5; }
+.brand-sub  { font-size: 11px; color: #80848e; }
+.nav { padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.nav-btn {
+  width: 100%; background: transparent; border: none; color: #b5bac1;
+  text-align: left; padding: 8px 10px; border-radius: 4px; cursor: pointer;
+  font-size: 13px; font-family: inherit; display: flex; align-items: center; gap: 8px;
+}
+.nav-btn:hover  { background: #35373c; color: #f2f3f5; }
+.nav-btn.active { background: #404249; color: #f2f3f5; }
+.nav-btn svg { flex-shrink: 0; }
+.sidebar-footer {
+  margin-top: auto; padding: 10px 12px; border-top: 1px solid #111214;
+  font-size: 11px; color: #4e5058;
+}
+
+/* Main */
+#main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 20px; border-bottom: 1px solid #111214; flex-shrink: 0;
+}
+.topbar h1 { font-size: 18px; font-weight: 600; color: #f2f3f5; }
+.topbar-actions { display: flex; gap: 8px; }
+
+/* Buttons */
+.btn {
+  padding: 7px 18px; border-radius: 3px; border: none; cursor: pointer;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+}
+.btn.ghost   { background: #4e5058; color: #dbdee1; }
+.btn.ghost:hover  { background: #6d6f78; }
+.btn.primary { background: #5865f2; color: #fff; }
+.btn.primary:hover { background: #4752c4; }
+.btn.danger  { background: #ed4245; color: #fff; font-size: 12px; padding: 5px 10px; }
+.btn.danger:hover { background: #c03537; }
+
+/* Pages */
+.page { display: none; flex: 1; overflow: hidden; min-height: 0; }
+.page.active { display: flex; }
+
+/* Build */
+#buildPanel { flex-direction: row; }
+
+.form-panel {
+  width: 55%; min-width: 340px; overflow-y: auto;
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 14px;
+  border-right: 1px solid #111214;
+  scrollbar-width: thin; scrollbar-color: #111214 transparent;
+}
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 11px; font-weight: 700; color: #b5bac1; text-transform: uppercase; letter-spacing: .06em; }
+.field-note  { font-size: 11px; color: #80848e; line-height: 1.4; }
+.field-note a { color: #00a8fc; text-decoration: none; cursor: pointer; }
+
+input:not([type=checkbox]):not([type=color]), select, textarea {
+  width: 100%; background: #111214; border: 1px solid #111214; border-radius: 3px;
+  padding: 8px 11px; color: #dbdee1; font-size: 14px; font-family: inherit;
+  outline: none; transition: border-color .15s;
+}
+input:not([type=checkbox]):not([type=color]):focus,
+select:focus, textarea:focus { border-color: #5865f2; }
+input::placeholder, textarea::placeholder { color: #4e5058; }
+
+select {
+  cursor: pointer; appearance: none; -webkit-appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%23b5bac1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+input[type=color] {
+  width: 52px; height: 34px; border: 1px solid #111214; border-radius: 3px;
+  background: #111214; cursor: pointer; padding: 2px 3px;
+}
+.check-row {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; color: #dbdee1; cursor: pointer; user-select: none;
+}
+.check-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #5865f2; cursor: pointer; }
+.row2 { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+.sdot-wrap { position: relative; }
+.sdot {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 9px; height: 9px; border-radius: 50%; pointer-events: none;
+}
+.sdot-wrap select { padding-left: 28px; }
+
+/* Preview */
+.preview-wrap {
+  flex: 1; background: #313338;
+  display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+}
+.preview-header {
+  padding: 11px 16px; border-bottom: 1px solid #111214;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 600; color: #f2f3f5; flex-shrink: 0;
+}
+.badge { background: #5865f2; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+#preview {
+  flex: 1; overflow-y: auto; padding: 16px;
+  scrollbar-width: thin; scrollbar-color: #111214 transparent;
+}
+
+/* Discord message */
+.msg-row { display: flex; gap: 12px; }
+.msg-avatar {
+  width: 38px; height: 38px; border-radius: 50%; background: #5865f2;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 15px; flex-shrink: 0;
+}
+.msg-col { flex: 1; min-width: 0; }
+.msg-author { font-size: 14px; font-weight: 600; color: #f2f3f5; margin-bottom: 3px; display: flex; align-items: baseline; gap: 6px; }
+.msg-time   { font-size: 11px; font-weight: 400; color: #80848e; }
+.msg-ping   { color: #c9cdfb; font-size: 14px; font-weight: 500; margin-bottom: 5px; }
+
+/* Components V2 */
+.cv2-container { border-radius: 4px; overflow: hidden; background: #2b2d31; margin-top: 2px; }
+.cv2-wrap { display: flex; }
+.cv2-bar  { width: 4px; flex-shrink: 0; }
+.cv2-inner { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.cv2-text { font-size: 14px; color: #dbdee1; line-height: 1.5; padding: 2px 0; }
+.cv2-text h2 { font-size: 16px; font-weight: 700; color: #f2f3f5; }
+.cv2-text strong { font-weight: 700; color: #f2f3f5; }
+.cv2-text em { font-style: italic; }
+.cv2-text a { color: #00a8fc; text-decoration: none; word-break: break-all; }
+.cv2-text pre {
+  background: #111214; border-radius: 4px; padding: 9px 11px;
+  font-family: Consolas, monospace; font-size: 12px;
+  white-space: pre-wrap; word-break: break-word; color: #dbdee1; margin: 4px 0;
+}
+.cv2-sep { height: 1px; background: #3f4147; margin: 8px 0; }
+.cv2-section { padding: 4px 0; }
+.cv2-section-label { font-size: 12px; font-weight: 700; color: #f2f3f5; margin-bottom: 4px; }
+.cv2-section-box {
+  background: #111214; border-radius: 3px; padding: 7px 10px;
+  font-size: 13px; color: #dbdee1; display: flex; align-items: center; gap: 7px;
+  font-family: Consolas, monospace;
+}
+.cv2-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.cv2-media { margin-top: 6px; border-radius: 3px; overflow: hidden; }
+.cv2-media img { width: 100%; display: block; object-fit: cover; }
+.cv2-footer-bar {
+  background: #232428; padding: 6px 14px;
+  font-size: 11px; color: #80848e;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.flag-row { display: flex; gap: 6px; }
+.flag-btn {
+  background: #4e5058; border-radius: 4px; padding: 4px 8px;
+  display: flex; align-items: center; justify-content: center;
+  min-width: 40px; min-height: 30px;
+}
+.flag-btn img { width: 24px; height: 18px; border-radius: 2px; object-fit: cover; }
+
+/* Settings */
+#settingsPanel {
+  flex-direction: column; overflow-y: auto; padding: 24px; gap: 20px;
+  scrollbar-width: thin; scrollbar-color: #111214 transparent;
+}
+.settings-card {
+  background: #2b2d31; border-radius: 6px; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px; max-width: 660px;
+}
+.settings-card h2 { font-size: 14px; font-weight: 600; color: #f2f3f5; padding-bottom: 10px; border-bottom: 1px solid #1e1f22; }
+.hint { font-size: 12px; color: #80848e; line-height: 1.6; }
+.channel-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 8px; align-items: center; }
+.settings-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 10px 18px; border-radius: 4px; font-size: 13px; font-weight: 500;
+  opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 9999;
+  background: #111214; border: 1px solid #14532d; color: #bbf7d0;
+}
+#toast.show       { opacity: 1; }
+#toast.show.error { border-color: #7f1d1d; color: #fecaca; }
+
+/* Overlay */
+#overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  align-items: center; justify-content: center; z-index: 9998;
+  flex-direction: column; gap: 14px;
+}
+#overlay.show { display: flex; }
+.spinner {
+  width: 32px; height: 32px; border: 3px solid #4e5058;
+  border-top-color: #5865f2; border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="brand">
+    <div class="brand-icon">A</div>
+    <div class="brand-name">Announce</div>
+    <div class="brand-sub">V2 Components</div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" data-tab="build">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Build
+    </button>
+    <button class="nav-btn" data-tab="settings">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      Settings
+    </button>
+  </nav>
+  <div class="sidebar-footer">Announce v2.0</div>
+</aside>
+
+<div id="main">
+  <header class="topbar">
+    <h1 id="pageTitle">Build announcement</h1>
+    <div class="topbar-actions" id="topbarActions">
+      <button class="btn ghost" id="resetBtn">Reset</button>
+      <button class="btn primary" id="sendBtn">Send</button>
+    </div>
+  </header>
+
+  <!-- BUILD -->
+  <section class="page active" id="buildPanel">
+    <div class="form-panel">
+
+      <div class="field">
+        <label class="field-label">Channel</label>
+        <select id="channelSel">
+          <option value="">Select a channel…</option>
+        </select>
+        <div class="field-note">Add channels in <a onclick="switchTab('settings')">Settings</a>.</div>
+      </div>
+
+      <div class="field">
+        <label class="check-row">
+          <input type="checkbox" id="pingEveryone" checked>
+          Ping @everyone above the announcement
+        </label>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Product</label>
+        <input type="text" id="product" placeholder="e.g. Void External" oninput="renderPreview()">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Status</label>
+        <div class="sdot-wrap">
+          <span class="sdot" id="sdot" style="background:#57f287"></span>
+          <select id="status" onchange="onStatus()">
+            <option value="UNDETECTED" data-c="#57f287">Undetected</option>
+            <option value="DETECTED"   data-c="#ed4245">Detected</option>
+            <option value="UPDATING"   data-c="#faa61a">Updating</option>
+            <option value="MAINTENANCE" data-c="#faa61a">Maintenance</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Live status URL</label>
+        <input type="url" id="statusUrl" placeholder="https://yoursite.com/status" oninput="renderPreview()">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Changelog</label>
+        <textarea id="changelog" rows="7" placeholder="- Added feature&#10;- Fixed bug" oninput="renderPreview()"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Banner image URL</label>
+        <input type="url" id="imageUrl" placeholder="https://cdn.discordapp.com/..." oninput="renderPreview()">
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">Footer (optional)</label>
+          <input type="text" id="footer" placeholder="e.g. OD Services Updates" oninput="renderPreview()">
+        </div>
+        <div class="field" style="align-items:flex-start">
+          <label class="field-label">Accent</label>
+          <input type="color" id="accentColor" value="#9900ff" oninput="renderPreview()">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="preview-wrap">
+      <div class="preview-header">
+        Live preview
+        <span class="badge">V2</span>
+      </div>
+      <div id="preview"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="page" id="settingsPanel">
+    <div class="settings-card">
+      <h2>Server connection</h2>
+      <p class="hint">Paste your Railway app URL here. This connects the dashboard to your hosted bot so it can fetch channels and send announcements.</p>
+      <div class="field">
+        <label class="field-label">Railway URL</label>
+        <input type="url" id="s-serverurl" placeholder="https://your-app.up.railway.app">
+      </div>
+      <div class="field">
+        <label class="field-label">Bot display name</label>
+        <input type="text" id="s-botname" placeholder="Announce">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn primary" onclick="saveSettings(); fetchChannels(); showToast('Settings saved!')">Save &amp; load channels</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+<div id="overlay"><div class="spinner"></div><span style="color:#f2f3f5;font-size:14px">Sending…</span></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const SC = { UNDETECTED:'#57f287', DETECTED:'#ed4245', UPDATING:'#faa61a', MAINTENANCE:'#faa61a' };
+const SE = { UNDETECTED:'🟢', DETECTED:'🔴', UPDATING:'🟡', MAINTENANCE:'🟠' };
+
+let channels = [];
+let botName  = localStorage.getItem('av2_botname') || 'Announce';
+let serverUrl = localStorage.getItem('av2_serverUrl') || '';
+
+function apiUrl(path) {
+  return serverUrl.replace(/\/$/, '') + path;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToast(msg, type='success') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type==='error' ? ' error' : '');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.className='', 3500);
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  $('buildPanel').classList.toggle('active', tab==='build');
+  $('settingsPanel').classList.toggle('active', tab==='settings');
+  $('pageTitle').textContent = tab==='build' ? 'Build announcement' : 'Settings';
+  $('topbarActions').style.display = tab==='build' ? '' : 'none';
+  if (tab==='settings') renderChannelRows();
+}
+document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+// ── Status dot ─────────────────────────────────────────────────────────────
+function onStatus() {
+  const sel = $('status');
+  $('sdot').style.background = sel.options[sel.selectedIndex].dataset.c || '#57f287';
+  renderPreview();
+}
+
+$('pingEveryone').addEventListener('change', renderPreview);
+
+// ── Channel select ─────────────────────────────────────────────────────────
+function loadChannelSelect() {
+  const sel = $('channelSel');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Select a channel…</option>';
+  channels.forEach(ch => {
+    const o = document.createElement('option');
+    o.value = ch.id;
+    o.textContent = '#' + ch.name;
+    sel.appendChild(o);
+  });
+  if (cur) sel.value = cur;
+}
+
+async function fetchChannels() {
+  if (!serverUrl) return;
+  try {
+    const res = await fetch(apiUrl('/api/channels'));
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error);
+    channels = body.channels;
+    loadChannelSelect();
+  } catch (e) {
+    showToast('Could not load channels: ' + e.message, 'error');
+  }
+}
+
+// ── Preview ────────────────────────────────────────────────────────────────
+function renderPreview() {
+  const product    = $('product').value;
+  const sel        = $('status');
+  const sv         = sel.value;
+  const slabel     = sel.options[sel.selectedIndex].text.toUpperCase();
+  const sc         = SC[sv] || '#57f287';
+  const emoji      = SE[sv] || '⚪';
+  const url        = $('statusUrl').value;
+  const changelog  = $('changelog').value;
+  const imageUrl   = $('imageUrl').value;
+  const footer     = $('footer').value;
+  const color      = $('accentColor').value;
+  const ping       = $('pingEveryone').checked;
+  const now        = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+  const bannerHtml = imageUrl
+    ? `<div class="cv2-media"><img src="${esc(imageUrl)}" alt="banner" onerror="this.parentElement.style.display='none'"></div>`
+    : '';
+
+  const changelogHtml = changelog
+    ? `<div class="cv2-sep"></div>
+       <div class="cv2-section">
+         <div class="cv2-section-label">Additional Information</div>
+         <div class="cv2-text"><pre>Changelog:\n${esc(changelog)}\n\nAny issues let us know 💖</pre></div>
+       </div>`
+    : '';
+
+  $('preview').innerHTML = `
+    <div class="msg-row">
+      <div class="msg-avatar">${esc(botName).charAt(0).toUpperCase()}</div>
+      <div class="msg-col">
+        <div class="msg-author">${esc(botName)} <span class="msg-time">Today at ${now}</span></div>
+        ${ping ? '<div class="msg-ping">@everyone</div>' : ''}
+        <div class="cv2-container">
+          <div class="cv2-wrap">
+            <div class="cv2-bar" style="background:${color}"></div>
+            <div class="cv2-inner">
+              <div class="cv2-text"><h2>📢 Product Announcement</h2></div>
+              <div class="cv2-section" style="padding-top:8px">
+                <div class="cv2-section-label">Product</div>
+                <div class="cv2-section-box">${esc(product || 'Your product')}</div>
+              </div>
+              <div class="cv2-section" style="padding-top:6px">
+                <div class="cv2-section-label">Current Status</div>
+                <div class="cv2-section-box">
+                  <span class="cv2-dot" style="background:${sc}"></span>
+                  ${emoji} ${slabel}
+                </div>
+              </div>
+              ${url ? `<div class="cv2-text" style="padding-top:6px;font-size:13px">View live status: <a href="${esc(url)}" target="_blank">${esc(url)}</a></div>` : ''}
+              ${changelogHtml}
+              ${bannerHtml}
+              ${footer ? `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(footer)}</div>` : ''}
+            </div>
+          </div>
+          <div class="cv2-footer-bar">
+            <span>${esc(footer)}</span>
+            <div class="flag-row">
+              ${['us','de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Send ───────────────────────────────────────────────────────────────────
+$('sendBtn').addEventListener('click', async () => {
+  if (!serverUrl) { showToast('Add your Railway URL in Settings first.', 'error'); return; }
+  const channelId = $('channelSel').value;
+  if (!channelId) { showToast('Select a channel first.', 'error'); return; }
+  const product = $('product').value.trim();
+  if (!product)  { showToast('Product name is required.', 'error'); return; }
+
+  $('overlay').classList.add('show');
+  try {
+    const res = await fetch(apiUrl('/api/announce'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        channelId,
+        product,
+        status:       $('status').value,
+        statusUrl:    $('statusUrl').value.trim(),
+        changelog:    $('changelog').value.trim(),
+        imageUrl:     $('imageUrl').value.trim(),
+        footer:       $('footer').value.trim(),
+        accentColor:  $('accentColor').value,
+        pingEveryone: $('pingEveryone').checked,
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showToast(`✓ Sent to #${body.channelName}`);
+    } else {
+      showToast('Error: ' + (body.error || res.status), 'error');
+    }
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error');
+  } finally {
+    $('overlay').classList.remove('show');
+  }
+});
+
+// ── Reset ──────────────────────────────────────────────────────────────────
+$('resetBtn').addEventListener('click', () => {
+  ['product','statusUrl','changelog','imageUrl','footer'].forEach(id => $(id).value = '');
+  $('status').value = 'UNDETECTED';
+  $('accentColor').value = '#9900ff';
+  $('pingEveryone').checked = true;
+  $('sdot').style.background = '#57f287';
+  renderPreview();
+  showToast('Form reset.');
+});
+
+// ── Settings ───────────────────────────────────────────────────────────────
+function saveSettings() {
+  serverUrl = $('s-serverurl').value.trim().replace(/\/$/, '');
+  botName   = $('s-botname').value.trim() || 'Announce';
+  localStorage.setItem('av2_serverUrl', serverUrl);
+  localStorage.setItem('av2_botname', botName);
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+$('s-botname').value   = botName;
+$('s-serverurl').value = serverUrl;
+
+if (serverUrl) fetchChannels();
+renderPreview();
+</script>
+</body>
+</html>
