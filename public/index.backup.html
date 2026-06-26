@@ -11,25 +11,21 @@
 <!-- Sidebar -->
 <aside id="sidebar">
   <div class="brand">
-    <div class="brand-logo">
-      <div class="brand-icon">A</div>
-      <div class="brand-name">Announce</div>
-    </div>
+    <div class="brand-icon">A</div>
+    <div class="brand-name">Announce</div>
     <div class="brand-sub">V2 Components</div>
   </div>
   <nav class="nav">
-    <div class="nav-section">Workspace</div>
     <button class="nav-btn active" data-tab="build">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Build
     </button>
     <button class="nav-btn" data-tab="general">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       General
     </button>
-    <div class="nav-section">System</div>
     <button class="nav-btn" data-tab="settings">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Settings
     </button>
   </nav>
@@ -42,16 +38,10 @@
 <!-- Main -->
 <div id="main">
   <header class="topbar">
-    <div class="topbar-left">
-      <h1 id="pageTitle">Build announcement</h1>
-      <span class="topbar-sub" id="pageSubtitle">Product status updates with language support</span>
-    </div>
+    <h1 id="pageTitle">Build announcement</h1>
     <div class="topbar-actions" id="topbarActions">
       <button class="btn ghost" id="resetBtn">Reset</button>
-      <button class="btn primary" id="sendBtn">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Send
-      </button>
+      <button class="btn primary" id="sendBtn">Send</button>
     </div>
   </header>
 
@@ -76,16 +66,17 @@
       <div class="field">
         <label class="field-label">Status</label>
         <div class="sdot-wrap">
-          <span class="sdot" id="sdot" style="background:#22c55e"></span>
+          <span class="sdot" id="sdot" style="background:#57f287"></span>
           <select id="status">
-            <option value="UNDETECTED" data-c="#22c55e">Updated</option>
-            <option value="DETECTED"   data-c="#ef4444">Detected</option>
-            <option value="UPDATING"   data-c="#f59e0b">Updating</option>
-            <option value="MAINTENANCE" data-c="#f59e0b">Maintenance</option>
+            <option value="UNDETECTED" data-c="#57f287">Updated</option>
+            <option value="DETECTED"   data-c="#ed4245">Detected</option>
+            <option value="UPDATING"   data-c="#faa61a">Updating</option>
+            <option value="MAINTENANCE" data-c="#faa61a">Maintenance</option>
           </select>
         </div>
       </div>
       <div class="field" style="display:none">
+        <label class="field-label">Live status URL</label>
         <input type="url" id="statusUrl" value="https://odservices.cc/status" />
       </div>
       <div class="field">
@@ -94,7 +85,7 @@
       </div>
       <div class="field">
         <label class="field-label">Banner image URL</label>
-        <input type="url" id="imageUrl" placeholder="https://cdn.discordapp.com/…" />
+        <input type="url" id="imageUrl" placeholder="https://cdn.discordapp.com/..." />
       </div>
       <div class="row2">
         <div class="field">
@@ -103,22 +94,21 @@
         </div>
         <div class="field" style="align-items:flex-start">
           <label class="field-label">Accent</label>
-          <input type="color" id="accentColor" value="#6c63ff" />
+          <input type="color" id="accentColor" value="#9900ff" />
         </div>
       </div>
     </div>
     <div class="preview-wrap">
-      <div class="preview-header">
-        <span>Live preview</span>
-        <span class="badge">V2</span>
-      </div>
+      <div class="preview-header"><span>Live preview</span><span class="badge">V2</span></div>
       <div id="preview"></div>
     </div>
   </section>
 
   <!-- GENERAL PAGE -->
   <section class="page" id="generalPanel">
-    <div class="form-panel" style="width:52%;min-width:340px">
+    <div class="form-panel" style="width:55%;min-width:340px">
+
+      <!-- Top options -->
       <div class="field">
         <label class="field-label">Channel</label>
         <select id="gChannelId"><option value="">Select a channel…</option></select>
@@ -133,6 +123,7 @@
         <label class="field-label">Header / Title</label>
         <input type="text" id="gHeader" placeholder="e.g. 📢 Important Update" />
       </div>
+
       <div class="row2" style="grid-template-columns:1fr auto;align-items:end">
         <div class="field" style="margin:0">
           <label class="field-label">Footer (optional)</label>
@@ -140,9 +131,11 @@
         </div>
         <div class="field" style="align-items:flex-start;margin:0">
           <label class="field-label">Accent</label>
-          <input type="color" id="gAccentColor" value="#6c63ff" />
+          <input type="color" id="gAccentColor" value="#9900ff" />
         </div>
       </div>
+
+      <!-- Block toolbar -->
       <div class="block-toolbar">
         <button class="block-add-btn" data-add="text">+ Text</button>
         <button class="block-add-btn" data-add="section">+ Section</button>
@@ -154,8 +147,12 @@
         <button class="block-add-btn ghost" id="collapseAll">Collapse All</button>
         <button class="block-add-btn ghost" id="expandAll">Expand All</button>
       </div>
+
+      <!-- Blocks list -->
       <div id="blocksContainer"></div>
+
     </div>
+
     <div class="preview-wrap">
       <div class="preview-header"><span>Live preview</span><span class="badge">V2</span></div>
       <div id="gPreview"></div>
@@ -164,17 +161,19 @@
 
   <!-- SETTINGS PAGE -->
   <section class="page" id="settingsPanel">
-    <div class="settings-card">
+    <div class="settings-card" id="envCard">
       <h2>Bot connection</h2>
       <p class="hint" id="envHint">Checking connection…</p>
-      <div class="field">
-        <label class="field-label">Bot token</label>
-        <input type="password" id="botToken" placeholder="Paste token to update" autocomplete="off" />
-        <small id="tokenHint">No token saved yet.</small>
-      </div>
-      <div class="field">
-        <label class="field-label">Server ID (Guild ID)</label>
-        <input type="text" id="guildId" placeholder="Right-click server → Copy Server ID" />
+      <div id="tokenFields">
+        <div class="field">
+          <label class="field-label">Bot token</label>
+          <input type="password" id="botToken" placeholder="Paste token to update" autocomplete="off" />
+          <small id="tokenHint">No token saved yet.</small>
+        </div>
+        <div class="field">
+          <label class="field-label">Server ID (Guild ID)</label>
+          <input type="text" id="guildId" placeholder="Right-click server → Copy Server ID" />
+        </div>
       </div>
       <div class="field">
         <label class="field-label">Default channel ID (optional)</label>
@@ -190,7 +189,7 @@
 </div>
 
 <div id="toast"></div>
-<div id="overlay"><div class="spinner"></div><span style="color:#e2e4ec;font-size:13px;font-weight:500">Sending…</span></div>
+<div id="overlay"><div class="spinner"></div><span style="color:#f2f3f5;font-size:14px">Sending…</span></div>
 
 <script src="/app.js"></script>
 </body>
