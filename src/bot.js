@@ -369,8 +369,12 @@ function getHistory() {
 async function editAnnouncement(messageId, channelId, data) {
   if (!client?.isReady()) throw new Error('Bot is not connected.');
 
+  // Fall back to stored channelId for entries saved before metadata was added
+  const resolvedChannelId = channelId || announcementStore.get(messageId)?._channelId;
+  if (!resolvedChannelId) throw new Error('Channel ID unknown — resend this announcement to re-link it.');
+
   const emojis = await resolveFlagEmojis();
-  const channel = await client.channels.fetch(channelId);
+  const channel = await client.channels.fetch(resolvedChannelId);
   const message = await channel.messages.fetch(messageId);
 
   let payload;

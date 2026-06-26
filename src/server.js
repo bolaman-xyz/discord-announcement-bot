@@ -154,7 +154,7 @@ app.post('/api/announce/edit', async (req, res) => {
     if (!settings.botToken) return res.status(400).json({ error: 'Add your bot token in Settings first.' });
     await connectBot(settings.botToken);
     const { messageId, channelId, data } = req.body;
-    if (!messageId || !channelId || !data) return res.status(400).json({ error: 'messageId, channelId and data are required.' });
+    if (!messageId || !data) return res.status(400).json({ error: 'messageId and data are required.' });
     const result = await editAnnouncement(messageId, channelId, data);
     res.json(result);
   } catch (error) {

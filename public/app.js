@@ -636,9 +636,9 @@ function openHistoryEditor(entry) {
     fields.innerHTML = `
       <div class="field"><label class="field-label">Header / Title</label><input type="text" id="heHeader" value="${esc(entry.data.header ?? '')}" /></div>
       <div class="field"><label class="field-label">Footer</label><input type="text" id="heFooter" value="${esc(entry.data.footer ?? '')}" /></div>
-      <div class="row2" style="grid-template-columns:1fr auto;align-items:end">
-        <div class="field" style="margin:0"><label class="field-label">Accent color</label></div>
-        <div class="field" style="align-items:flex-start;margin:0"><input type="color" id="heAccent" value="${esc(entry.data.accentColor ?? '#6c63ff')}" /></div>
+      <div class="field" style="flex-direction:row;align-items:center;gap:10px">
+        <label class="field-label" style="margin:0">Accent color</label>
+        <input type="color" id="heAccent" value="${esc(entry.data.accentColor ?? '#6c63ff')}" />
       </div>
       <div class="field"><label class="field-label">Blocks (read-only summary)</label>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2)">
