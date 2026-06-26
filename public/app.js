@@ -174,18 +174,30 @@ function toggleCollapse(id) {
   if (b) { b.collapsed = !b.collapsed; renderBlocks(); }
 }
 
+function moveBlock(id, dir) {
+  const idx = gBlocks.findIndex(b => b.id === id);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= gBlocks.length) return;
+  [gBlocks[idx], gBlocks[newIdx]] = [gBlocks[newIdx], gBlocks[idx]];
+  renderBlocks();
+  renderGeneralPreview();
+}
+
 function renderBlocks() {
   const container = $('blocksContainer');
   container.innerHTML = '';
   gBlocks.forEach(block => {
     const el = document.createElement('div');
     el.className = 'block-card' + (block.collapsed ? ' collapsed' : '');
+    const idx = gBlocks.indexOf(block);
     el.innerHTML = `
       <div class="block-header">
         <span class="block-icon">${BLOCK_ICONS[block.type]}</span>
         <span class="block-title">${BLOCK_LABELS[block.type]}</span>
         <div class="block-actions">
           <button class="block-hbtn" data-collapse="${block.id}">${block.collapsed ? '▶' : '▼'}</button>
+          <button class="block-hbtn" data-move="${block.id}" data-dir="-1" ${idx === 0 ? 'disabled' : ''}>↑</button>
+          <button class="block-hbtn" data-move="${block.id}" data-dir="1" ${idx === gBlocks.length-1 ? 'disabled' : ''}>↓</button>
           <button class="block-hbtn danger" data-remove="${block.id}">✕</button>
         </div>
       </div>
@@ -194,12 +206,15 @@ function renderBlocks() {
     container.appendChild(el);
   });
 
-  // wire collapse/remove buttons
+  // wire collapse/remove/move buttons
   container.querySelectorAll('[data-collapse]').forEach(btn => {
     btn.addEventListener('click', () => toggleCollapse(Number(btn.dataset.collapse)));
   });
   container.querySelectorAll('[data-remove]').forEach(btn => {
     btn.addEventListener('click', () => removeBlock(Number(btn.dataset.remove)));
+  });
+  container.querySelectorAll('[data-move]').forEach(btn => {
+    btn.addEventListener('click', () => moveBlock(Number(btn.dataset.move), Number(btn.dataset.dir)));
   });
 
   // wire field inputs
@@ -282,15 +297,19 @@ function renderBlockFields(block) {
     case 'media':
       return `
         ${b.urls.map((u, i) => `
-          <input type="url" placeholder="Image URL…" value="${esc(u)}" data-bid="${b.id}" data-key="urls" data-idx="${i}" style="margin-bottom:4px" />
+          <div style="margin-bottom:8px">
+            <label class="field-label">Media URL</label>
+            <input type="url" placeholder="https://example.com/image.png" value="${esc(u)}" data-bid="${b.id}" data-key="urls" data-idx="${i}" style="margin-top:4px" />
+          </div>
         `).join('')}
-        <button class="block-add-btn" style="margin-top:4px" data-addurl="${b.id}">+ Add image</button>`;
+        <button class="block-add-btn" style="width:100%;text-align:center;padding:8px" data-addurl="${b.id}">+ Media Item</button>`;
 
     case 'file':
       return `
-        <input type="url" placeholder="File URL…" value="${esc(b.url)}" data-bid="${b.id}" data-key="url" />
-        <label class="field-label" style="margin-top:8px">Display name (optional)</label>
-        <input type="text" placeholder="filename.pdf" value="${esc(b.name)}" data-bid="${b.id}" data-key="name" />`;
+        <label class="field-label">Attachment URL</label>
+        <input type="url" placeholder="https://…" value="${esc(b.url)}" data-bid="${b.id}" data-key="url" style="margin-top:4px" />
+        <label class="field-label" style="margin-top:10px">Display name (optional)</label>
+        <input type="text" placeholder="e.g. Void External downloads" value="${esc(b.name)}" data-bid="${b.id}" data-key="name" style="margin-top:4px" />`;
 
     case 'separator':
       return `<p style="color:#80848e;font-size:12px;margin:0">Adds a horizontal divider line.</p>`;
