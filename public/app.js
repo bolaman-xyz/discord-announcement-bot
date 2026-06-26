@@ -178,7 +178,7 @@ function renderPreview() {
               ${bannerHtml}
               ${d.footer ? `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(d.footer)}</div>` : ''}
               <div class="flag-row" style="padding-top:8px">
-                ${['us','de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}
+                ${['de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}
               </div>
             </div>
           </div>
@@ -425,7 +425,7 @@ function renderGeneralPreview() {
   });
 
   if (footer) innerHtml += `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(footer)}</div>`;
-  innerHtml += `<div class="flag-row" style="padding-top:4px">${['us','de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}</div>`;
+  innerHtml += `<div class="flag-row" style="padding-top:4px">${['de','fr','es','br'].map(c=>`<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}</div>`;
   // Website + all buttons-below merged into one row
   const allBelowLabels = ['🔗 Website', ...belowBtns];
   belowHtml += `<div class="flag-row" style="margin-top:6px">${allBelowLabels.map(l=>`<div class="flag-btn" style="padding:4px 12px;font-size:13px;color:#dbdee1">${esc(l)}</div>`).join('')}</div>`;

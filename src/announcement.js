@@ -13,7 +13,6 @@ const {
 const { UI, getStatusText } = require('./translations');
 
 const LANG_BUTTONS = [
-  { id: 'lang_en', emoji: '🇺🇸', lang: 'en' },
   { id: 'lang_de', emoji: '🇩🇪', lang: 'de' },
   { id: 'lang_fr', emoji: '🇫🇷', lang: 'fr' },
   { id: 'lang_es', emoji: '🇪🇸', lang: 'es' },
