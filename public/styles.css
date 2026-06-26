@@ -457,3 +457,55 @@ input[type=color] {
   animation: spin .7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Mobile ── */
+@media (max-width: 700px) {
+  html, body { overflow: auto; }
+
+  body { flex-direction: column; }
+
+  #sidebar {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid #111214;
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .brand { padding: 0; border-bottom: none; display: flex; align-items: center; gap: 8px; }
+  .brand-icon { margin-bottom: 0; width: 28px; height: 28px; font-size: 13px; flex-shrink: 0; }
+  .brand-sub { display: none; }
+
+  .nav { flex-direction: row; padding: 0; gap: 4px; }
+  .nav-btn { padding: 6px 10px; font-size: 12px; }
+
+  .bot-status { margin-top: 0; margin-left: auto; border-top: none; padding: 0; font-size: 11px; }
+
+  #main { height: auto; overflow: visible; }
+
+  .page { overflow: visible; }
+  .page.active { flex-direction: column; }
+
+  #buildPanel { flex-direction: column; }
+
+  .form-panel {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid #111214;
+    padding: 14px;
+  }
+
+  .preview-wrap { min-height: 420px; }
+
+  #settingsPanel { padding: 14px; }
+  .settings-card { max-width: 100%; }
+
+  .topbar { padding: 10px 14px; }
+  .topbar h1 { font-size: 15px; }
+  .btn { padding: 7px 12px; font-size: 12px; }
+}
