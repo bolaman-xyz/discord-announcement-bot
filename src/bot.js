@@ -245,13 +245,14 @@ async function buildGeneralPayload(data, emojis) {
   if (data.header?.trim())
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${data.header.trim()}`));
 
-  if (data.bannerUrl?.trim())
-    container.addMediaGalleryComponents(
-      new MediaGalleryBuilder().addItems(new MediaGalleryItemBuilder().setURL(data.bannerUrl.trim()))
-    );
-
   for (const block of (data.blocks ?? [])) {
     switch (block.type) {
+      case 'banner':
+        if (block.url?.trim())
+          container.addMediaGalleryComponents(
+            new MediaGalleryBuilder().addItems(new MediaGalleryItemBuilder().setURL(block.url.trim()))
+          );
+        break;
       case 'text':
         if (block.content?.trim())
           container.addTextDisplayComponents(new TextDisplayBuilder().setContent(block.content.trim()));

@@ -132,7 +132,6 @@ app.post('/api/announce/general', async (req, res) => {
     const { sendGeneralAnnouncement } = require('./bot');
     const result = await sendGeneralAnnouncement(channelId, {
       header:       req.body.header,
-      bannerUrl:    req.body.bannerUrl,
       blocks:       req.body.blocks,
       footer:       req.body.footer,
       accentColor:  req.body.accentColor,
