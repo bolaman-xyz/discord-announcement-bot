@@ -48,12 +48,15 @@ function switchTab(tab) {
   document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
   $('buildPanel').classList.toggle('active', tab==='build');
   $('generalPanel').classList.toggle('active', tab==='general');
+  $('historyPanel').classList.toggle('active', tab==='history');
   $('settingsPanel').classList.toggle('active', tab==='settings');
-  const titles = { build:'Build announcement', general:'General announcement', settings:'Bot settings' };
+  const titles = { build:'Build announcement', general:'General announcement', history:'History', settings:'Bot settings' };
   $('pageTitle').textContent = titles[tab] ?? '';
   $('topbarActions').style.display = (tab==='build'||tab==='general') ? '' : 'none';
   $('sendBtn').dataset.tab = tab;
   $('resetBtn').style.display = tab==='general' ? 'none' : '';
+
+  if (tab === 'history') loadHistory();
 
   // Mobile: show/hide FAB
   const fab = $('previewFab');
@@ -574,6 +577,132 @@ $('sendBtn').addEventListener('click', async () => {
   finally { $('overlay').classList.remove('show'); }
 });
 
+// ── History ────────────────────────────────────────────────────────────────
+let historyData = [];
+let activeEntry = null;
+
+function formatTime(ts) {
+  if (!ts) return 'Unknown time';
+  const d = new Date(ts);
+  return d.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
+    + ' at ' + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+}
+
+async function loadHistory() {
+  try {
+    const { history } = await api('/api/history');
+    historyData = history;
+    renderHistoryList();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+function renderHistoryList() {
+  const list = $('historyList');
+  $('historyCount').textContent = `${historyData.length} announcement${historyData.length !== 1 ? 's' : ''}`;
+  if (!historyData.length) {
+    list.innerHTML = '<div class="history-empty">No announcements yet.</div>';
+    return;
+  }
+  list.innerHTML = historyData.map(entry => `
+    <div class="history-item${activeEntry?.messageId === entry.messageId ? ' active' : ''}" data-id="${esc(entry.messageId)}">
+      <div class="history-item-top">
+        <span class="history-badge ${entry.type}">${entry.type}</span>
+        <span class="history-item-title">${esc(entry.title)}</span>
+      </div>
+      <div class="history-item-meta">
+        <span>${entry.channelName ? '#' + esc(entry.channelName) : 'Unknown channel'}</span>
+        <span>${formatTime(entry.sentAt)}</span>
+      </div>
+    </div>
+  `).join('');
+  list.querySelectorAll('.history-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const entry = historyData.find(e => e.messageId === el.dataset.id);
+      if (entry) openHistoryEditor(entry);
+    });
+  });
+}
+
+function openHistoryEditor(entry) {
+  activeEntry = entry;
+  renderHistoryList();
+  $('historyEditorPlaceholder').style.display = 'none';
+  $('historyEditor').style.display = 'flex';
+  $('historyEditorTitle').textContent = entry.type === 'general' ? 'Edit general announcement' : 'Edit build announcement';
+  $('historyEditorMeta').textContent = `#${entry.channelName ?? 'unknown'} · sent ${formatTime(entry.sentAt)}`;
+
+  const fields = $('historyEditorFields');
+  if (entry.type === 'general') {
+    fields.innerHTML = `
+      <div class="field"><label class="field-label">Header / Title</label><input type="text" id="heHeader" value="${esc(entry.data.header ?? '')}" /></div>
+      <div class="field"><label class="field-label">Footer</label><input type="text" id="heFooter" value="${esc(entry.data.footer ?? '')}" /></div>
+      <div class="row2" style="grid-template-columns:1fr auto;align-items:end">
+        <div class="field" style="margin:0"><label class="field-label">Accent color</label></div>
+        <div class="field" style="align-items:flex-start;margin:0"><input type="color" id="heAccent" value="${esc(entry.data.accentColor ?? '#6c63ff')}" /></div>
+      </div>
+      <div class="field"><label class="field-label">Blocks (read-only summary)</label>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2)">
+          ${(entry.data.blocks ?? []).length} block(s): ${(entry.data.blocks ?? []).map(b => b.type).join(', ') || 'none'}
+          <br><span style="color:var(--text3);font-size:11px">Full block editing coming soon — header, footer and accent can be edited above.</span>
+        </div>
+      </div>`;
+  } else {
+    fields.innerHTML = `
+      <div class="field"><label class="field-label">Product</label><input type="text" id="heProduct" value="${esc(entry.data.product ?? '')}" /></div>
+      <div class="field"><label class="field-label">Status</label>
+        <select id="heStatus">
+          ${['UNDETECTED','DETECTED','UPDATING','MAINTENANCE'].map(s =>
+            `<option value="${s}"${entry.data.status === s ? ' selected' : ''}>${s === 'UNDETECTED' ? 'Updated' : s.charAt(0) + s.slice(1).toLowerCase()}</option>`
+          ).join('')}
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Changelog</label><textarea id="heChangelog" rows="6">${esc(entry.data.changelog ?? '')}</textarea></div>
+      <div class="field"><label class="field-label">Banner image URL</label><input type="url" id="heImageUrl" value="${esc(entry.data.imageUrl ?? '')}" /></div>
+      <div class="row2" style="grid-template-columns:1fr auto;align-items:end">
+        <div class="field" style="margin:0"><label class="field-label">Footer</label><input type="text" id="heFooter" value="${esc(entry.data.footer ?? '')}" /></div>
+        <div class="field" style="align-items:flex-start;margin:0"><label class="field-label">Accent</label><input type="color" id="heAccent" value="${esc(entry.data.accentColor ?? '#6c63ff')}" /></div>
+      </div>`;
+  }
+}
+
+$('refreshHistoryBtn').addEventListener('click', loadHistory);
+
+$('saveEditBtn').addEventListener('click', async () => {
+  if (!activeEntry) return;
+  const d = activeEntry.data;
+  let updatedData;
+  if (activeEntry.type === 'general') {
+    updatedData = {
+      ...d,
+      header: $('heHeader')?.value.trim() ?? d.header,
+      footer: $('heFooter')?.value.trim() ?? d.footer,
+      accentColor: $('heAccent')?.value ?? d.accentColor,
+    };
+  } else {
+    updatedData = {
+      ...d,
+      product: $('heProduct')?.value.trim() ?? d.product,
+      status: $('heStatus')?.value ?? d.status,
+      changelog: $('heChangelog')?.value.trim() ?? d.changelog,
+      imageUrl: $('heImageUrl')?.value.trim() ?? d.imageUrl,
+      footer: $('heFooter')?.value.trim() ?? d.footer,
+      accentColor: $('heAccent')?.value ?? d.accentColor,
+    };
+  }
+  $('overlay').classList.add('show');
+  try {
+    await api('/api/announce/edit', { method:'POST', body: JSON.stringify({
+      messageId: activeEntry.messageId,
+      channelId: activeEntry.channelId,
+      data: updatedData,
+    })});
+    activeEntry.data = updatedData;
+    showToast('✓ Message updated in Discord');
+    await loadHistory();
+  } catch (e) { showToast(e.message, 'error'); }
+  finally { $('overlay').classList.remove('show'); }
+});
+
 // ── Init ───────────────────────────────────────────────────────────────────
 (async function init() {
   try {
@@ -583,5 +712,6 @@ $('sendBtn').addEventListener('click', async () => {
   } catch (e) { showToast(e.message, 'error'); }
   renderPreview();
   renderGeneralPreview();
+  loadHistory();
   setInterval(refreshBotStatus, 5000);
 })();

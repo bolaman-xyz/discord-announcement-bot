@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('node:path');
-const { connectBot, getBotStatus, listGuildChannels, sendAnnouncement } = require('./bot');
+const { connectBot, getBotStatus, listGuildChannels, sendAnnouncement, getHistory, editAnnouncement } = require('./bot');
 const { loadSettings, saveSettings, maskToken } = require('./settings');
 
 const app = express();
@@ -141,6 +141,25 @@ app.post('/api/announce/general', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: error.message ?? 'Failed to send.' });
+  }
+});
+
+app.get('/api/history', (_req, res) => {
+  res.json({ history: getHistory() });
+});
+
+app.post('/api/announce/edit', async (req, res) => {
+  try {
+    const settings = loadSettings();
+    if (!settings.botToken) return res.status(400).json({ error: 'Add your bot token in Settings first.' });
+    await connectBot(settings.botToken);
+    const { messageId, channelId, data } = req.body;
+    if (!messageId || !channelId || !data) return res.status(400).json({ error: 'messageId, channelId and data are required.' });
+    const result = await editAnnouncement(messageId, channelId, data);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message ?? 'Failed to edit.' });
   }
 });
 

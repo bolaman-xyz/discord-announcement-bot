@@ -28,6 +28,10 @@
       General
     </button>
     <div class="nav-section">System</div>
+    <button class="nav-btn" data-tab="history">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      History
+    </button>
     <button class="nav-btn" data-tab="settings">
       <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Settings
@@ -162,6 +166,41 @@
     </div>
   </section>
 
+  <!-- HISTORY PAGE -->
+  <section class="page" id="historyPanel">
+    <div class="history-layout">
+      <div class="history-list-wrap">
+        <div class="history-toolbar">
+          <span class="history-count" id="historyCount">0 announcements</span>
+          <button class="btn ghost small" id="refreshHistoryBtn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div id="historyList"><div class="history-empty">No announcements yet.</div></div>
+      </div>
+      <div class="history-editor-wrap" id="historyEditorWrap">
+        <div class="history-editor-placeholder" id="historyEditorPlaceholder">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text3)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Select an announcement to edit</span>
+        </div>
+        <div id="historyEditor" style="display:none">
+          <div class="history-editor-header">
+            <div>
+              <div class="history-editor-title" id="historyEditorTitle">Editing announcement</div>
+              <div class="history-editor-meta" id="historyEditorMeta"></div>
+            </div>
+            <button class="btn primary" id="saveEditBtn">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Save edit
+            </button>
+          </div>
+          <div id="historyEditorFields"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- SETTINGS PAGE -->
   <section class="page" id="settingsPanel">
     <div class="settings-card">
@@ -198,6 +237,10 @@
   <button class="mob-nav-btn" data-tab="general">
     <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     General
+  </button>
+  <button class="mob-nav-btn" data-tab="history">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    History
   </button>
   <button class="mob-nav-btn" data-tab="settings">
     <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>

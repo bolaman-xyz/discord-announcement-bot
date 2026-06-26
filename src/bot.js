@@ -220,7 +220,7 @@ async function sendAnnouncement(channelId, data) {
 
   const payload = buildAnnouncementComponents(data, 'en', emojis);
   const message = await channel.send(payload);
-  announcementStore.set(message.id, data);
+  announcementStore.set(message.id, { ...data, _type: 'build', _channelId: channel.id, _channelName: channel.name, _sentAt: Date.now() });
   saveStore(announcementStore);
 
   return {
@@ -343,10 +343,49 @@ async function sendGeneralAnnouncement(channelId, data) {
   const payload = await buildGeneralPayload(data, emojis);
   const message = await channel.send(payload);
 
-  announcementStore.set(message.id, { ...data, _type: 'general' });
+  announcementStore.set(message.id, { ...data, _type: 'general', _channelId: channel.id, _channelName: channel.name, _sentAt: Date.now() });
   saveStore(announcementStore);
 
   return { messageId: message.id, channelId: channel.id, channelName: channel.name };
+}
+
+function getHistory() {
+  const entries = [];
+  for (const [messageId, data] of announcementStore.entries()) {
+    entries.push({
+      messageId,
+      type: data._type ?? 'build',
+      channelId: data._channelId ?? null,
+      channelName: data._channelName ?? null,
+      sentAt: data._sentAt ?? null,
+      title: data._type === 'general' ? (data.header || '(no header)') : (data.product || '(no product)'),
+      data,
+    });
+  }
+  return entries.sort((a, b) => (b.sentAt ?? 0) - (a.sentAt ?? 0));
+}
+
+async function editAnnouncement(messageId, channelId, data) {
+  if (!client?.isReady()) throw new Error('Bot is not connected.');
+
+  const emojis = await resolveFlagEmojis();
+  const channel = await client.channels.fetch(channelId);
+  const message = await channel.messages.fetch(messageId);
+
+  let payload;
+  if (data._type === 'general') {
+    payload = await buildGeneralPayload(data, emojis);
+  } else {
+    payload = buildAnnouncementComponents(data, 'en', emojis);
+  }
+
+  await message.edit(payload);
+
+  const existing = announcementStore.get(messageId) ?? {};
+  announcementStore.set(messageId, { ...existing, ...data, _editedAt: Date.now() });
+  saveStore(announcementStore);
+
+  return { ok: true };
 }
 
 module.exports = {
@@ -355,4 +394,6 @@ module.exports = {
   listGuildChannels,
   sendAnnouncement,
   sendGeneralAnnouncement,
+  getHistory,
+  editAnnouncement,
 };
