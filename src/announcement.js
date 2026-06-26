@@ -63,6 +63,12 @@ function buildAnnouncementComponents(data, lang = 'en', flagEmojis = {}) {
     );
   }
 
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setLabel('Website').setURL('https://odservices.cc/').setStyle(ButtonStyle.Link).setEmoji('🔗'),
+    ),
+  );
+
   const buttonRow = new ActionRowBuilder().addComponents(
     ...LANG_BUTTONS.map(({ id }) => {
       const button = new ButtonBuilder()
