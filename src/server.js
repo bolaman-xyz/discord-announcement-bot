@@ -116,6 +116,35 @@ app.post('/api/announce', async (req, res) => {
   }
 });
 
+app.post('/api/announce/general', async (req, res) => {
+  try {
+    const settings = loadSettings();
+    if (!settings.botToken) {
+      res.status(400).json({ error: 'Add your bot token in Settings first.' });
+      return;
+    }
+    const channelId = req.body.channelId?.trim() || settings.defaultChannelId;
+    if (!channelId) {
+      res.status(400).json({ error: 'Pick a channel.' });
+      return;
+    }
+    await connectBot(settings.botToken);
+    const { sendGeneralAnnouncement } = require('./bot');
+    const result = await sendGeneralAnnouncement(channelId, {
+      title:       req.body.title,
+      message:     req.body.message,
+      imageUrl:    req.body.imageUrl,
+      footer:      req.body.footer,
+      accentColor: req.body.accentColor,
+      pingEveryone: req.body.pingEveryone,
+    });
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message ?? 'Failed to send.' });
+  }
+});
+
 async function start() {
   const settings = loadSettings();
 

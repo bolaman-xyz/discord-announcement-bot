@@ -20,6 +20,10 @@
       <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Build
     </button>
+    <button class="nav-btn" data-tab="general">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      General
+    </button>
     <button class="nav-btn" data-tab="settings">
       <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Settings
@@ -115,6 +119,64 @@
         <span class="badge">V2</span>
       </div>
       <div id="preview"></div>
+    </div>
+
+  </section>
+
+  <!-- GENERAL PAGE -->
+  <section class="page" id="generalPanel">
+
+    <div class="form-panel">
+
+      <div class="field">
+        <label class="field-label">Channel</label>
+        <select id="gChannelId">
+          <option value="">Select a channel…</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="check-row">
+          <input type="checkbox" id="gPingEveryone" checked />
+          Ping @everyone above the announcement
+        </label>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Title</label>
+        <input type="text" id="gTitle" placeholder="e.g. Important Update" />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Message</label>
+        <textarea id="gMessage" rows="8" placeholder="Write your announcement here…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Banner image URL</label>
+        <input type="url" id="gImageUrl" placeholder="https://cdn.discordapp.com/..." />
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">Footer (optional)</label>
+          <input type="text" id="gFooter" placeholder="e.g. OD Services Updates" />
+        </div>
+        <div class="field" style="align-items:flex-start">
+          <label class="field-label">Accent</label>
+          <input type="color" id="gAccentColor" value="#9900ff" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-wrap">
+      <div class="preview-header">
+        <span>Live preview</span>
+        <span class="badge">V2</span>
+      </div>
+      <div id="gPreview"></div>
     </div>
 
   </section>

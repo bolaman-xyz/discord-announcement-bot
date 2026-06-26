@@ -47,9 +47,13 @@ async function api(path, opts = {}) {
 function switchTab(tab) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $('buildPanel').classList.toggle('active', tab === 'build');
+  $('generalPanel').classList.toggle('active', tab === 'general');
   $('settingsPanel').classList.toggle('active', tab === 'settings');
-  $('pageTitle').textContent = tab === 'build' ? 'Build announcement' : 'Bot settings';
-  $('topbarActions').style.display = tab === 'build' ? '' : 'none';
+  const titles = { build: 'Build announcement', general: 'General announcement', settings: 'Bot settings' };
+  $('pageTitle').textContent = titles[tab] ?? '';
+  $('topbarActions').style.display = (tab === 'build' || tab === 'general') ? '' : 'none';
+  $('sendBtn').dataset.tab = tab;
+  $('resetBtn').style.display = tab === 'general' ? 'none' : '';
 }
 
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
@@ -96,6 +100,56 @@ function setFormData(d = {}) {
   const el = $(id);
   el.addEventListener('input',  renderPreview);
   el.addEventListener('change', renderPreview);
+});
+
+// ── General preview ────────────────────────────────────────────────────────
+function renderGeneralPreview() {
+  const title      = $('gTitle').value.trim();
+  const message    = $('gMessage').value.trim();
+  const imageUrl   = $('gImageUrl').value.trim();
+  const footer     = $('gFooter').value.trim();
+  const color      = $('gAccentColor').value || '#9900ff';
+  const ping       = $('gPingEveryone').checked;
+
+  const avatarHtml = window._botAvatar
+    ? `<img src="${esc(window._botAvatar)}" alt="avatar">`
+    : (window._botName ?? 'A').charAt(0).toUpperCase();
+  const botName = window._botName ?? 'Announce';
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const bannerHtml = imageUrl
+    ? `<div class="cv2-media"><img src="${esc(imageUrl)}" alt="banner" onerror="this.parentElement.style.display='none'"></div>`
+    : '';
+
+  const footerHtml = footer
+    ? `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(footer)}</div>`
+    : '';
+
+  $('gPreview').innerHTML = `
+    <div class="msg-row">
+      <div class="msg-avatar">${avatarHtml}</div>
+      <div class="msg-col">
+        <div class="msg-author">${esc(botName)} <span class="msg-time">Today at ${now}</span></div>
+        ${ping ? '<div class="msg-ping">@everyone</div>' : ''}
+        <div class="cv2-container">
+          <div class="cv2-accent-wrap">
+            <div class="cv2-bar" style="background:${color}"></div>
+            <div class="cv2-inner">
+              ${title ? `<div class="cv2-text"><h2>${esc(title)}</h2></div>` : ''}
+              ${message ? `<div class="cv2-text" style="padding-top:6px"><pre>${esc(message)}</pre></div>` : ''}
+              ${bannerHtml}
+              ${footerHtml}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+['gTitle','gMessage','gImageUrl','gFooter','gAccentColor','gPingEveryone'].forEach(id => {
+  const el = $(id);
+  el.addEventListener('input',  renderGeneralPreview);
+  el.addEventListener('change', renderGeneralPreview);
 });
 
 // ── Live preview ───────────────────────────────────────────────────────────
@@ -218,6 +272,17 @@ async function loadChannels() {
     const def = $('defaultChannelId').value;
     if (cur) sel.value = cur;
     else if (def) sel.value = def;
+
+    // also populate general tab channel dropdown
+    const gSel = $('gChannelId');
+    const gCur = gSel.value;
+    gSel.innerHTML = '<option value="">Select a channel…</option>';
+    channels.forEach(ch => {
+      const o = document.createElement('option');
+      o.value = ch.id; o.textContent = '#' + ch.name;
+      gSel.appendChild(o);
+    });
+    if (gCur) gSel.value = gCur;
   } catch (e) {
     showToast(e.message, 'error');
   }
@@ -280,21 +345,41 @@ $('resetBtn').addEventListener('click', async () => {
 // ── Send ───────────────────────────────────────────────────────────────────
 $('sendBtn').addEventListener('click', async () => {
   const status = await api('/api/bot/status');
+  if (!status.online) { showToast('Bot is offline. Check your token in Settings.', 'error'); return; }
 
-  if (!status.online) {
-    showToast('Bot is offline. Check your token in Settings.', 'error');
+  const tab = $('sendBtn').dataset.tab || 'build';
+
+  if (tab === 'general') {
+    const title   = $('gTitle').value.trim();
+    const message = $('gMessage').value.trim();
+    if (!title && !message) { showToast('Add a title or message.', 'error'); return; }
+    $('overlay').classList.add('show');
+    try {
+      const result = await api('/api/announce/general', {
+        method: 'POST',
+        body: JSON.stringify({
+          channelId:    $('gChannelId').value,
+          pingEveryone: $('gPingEveryone').checked,
+          title,
+          message,
+          imageUrl:    $('gImageUrl').value.trim(),
+          footer:      $('gFooter').value.trim(),
+          accentColor: $('gAccentColor').value,
+        }),
+      });
+      showToast(`✓ Sent to #${result.channelName}`);
+    } catch (e) {
+      showToast(e.message, 'error');
+    } finally {
+      $('overlay').classList.remove('show');
+    }
     return;
   }
-  if (!status.flagsReady) {
-    showToast('Flag buttons are still loading — wait a moment and try again.', 'error');
-    return;
-  }
+
+  if (!status.flagsReady) { showToast('Flag buttons are still loading — wait a moment and try again.', 'error'); return; }
 
   const data = getFormData();
-  if (!data.product) {
-    showToast('Product name is required.', 'error');
-    return;
-  }
+  if (!data.product) { showToast('Product name is required.', 'error'); return; }
 
   $('overlay').classList.add('show');
   try {
@@ -320,6 +405,6 @@ $('sendBtn').addEventListener('click', async () => {
     showToast(e.message, 'error');
   }
   renderPreview();
-  // Poll bot status every 5s so flags-loading state updates automatically
+  renderGeneralPreview();
   setInterval(refreshBotStatus, 5000);
 })();
