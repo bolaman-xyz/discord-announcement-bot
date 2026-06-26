@@ -131,10 +131,11 @@ app.post('/api/announce/general', async (req, res) => {
     await connectBot(settings.botToken);
     const { sendGeneralAnnouncement } = require('./bot');
     const result = await sendGeneralAnnouncement(channelId, {
-      header:      req.body.header,
-      blocks:      req.body.blocks,
-      footer:      req.body.footer,
-      accentColor: req.body.accentColor,
+      header:       req.body.header,
+      bannerUrl:    req.body.bannerUrl,
+      blocks:       req.body.blocks,
+      footer:       req.body.footer,
+      accentColor:  req.body.accentColor,
       pingEveryone: req.body.pingEveryone,
     });
     res.json({ ok: true, ...result });

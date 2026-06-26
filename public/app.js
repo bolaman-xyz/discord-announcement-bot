@@ -379,15 +379,17 @@ function renderBlockFields(block) {
 
 // General preview from blocks
 function renderGeneralPreview() {
-  const color  = $('gAccentColor').value || '#9900ff';
-  const ping   = $('gPingEveryone').checked;
-  const footer = $('gFooter').value.trim();
-  const header = $('gHeader').value.trim();
+  const color     = $('gAccentColor').value || '#9900ff';
+  const ping      = $('gPingEveryone').checked;
+  const footer    = $('gFooter').value.trim();
+  const header    = $('gHeader').value.trim();
+  const bannerUrl = $('gBannerUrl').value.trim();
   const avatarHtml = window._botAvatar ? `<img src="${esc(window._botAvatar)}" alt="avatar">` : (window._botName??'A').charAt(0).toUpperCase();
   const botName = window._botName ?? 'Announce';
   const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
   let innerHtml = header ? `<div class="cv2-text"><h2>${esc(header)}</h2></div>` : '';
+  if (bannerUrl) innerHtml += `<div style="margin:6px 0 2px"><img src="${esc(bannerUrl)}" style="width:100%;border-radius:6px;display:block" /></div>`;
   let belowHtml = '';
 
   gBlocks.forEach(block => {
@@ -444,7 +446,7 @@ function renderGeneralPreview() {
 }
 
 // wire general top-level inputs to preview
-['gHeader','gFooter','gAccentColor','gPingEveryone'].forEach(id => {
+['gHeader','gFooter','gAccentColor','gPingEveryone','gBannerUrl'].forEach(id => {
   $(id).addEventListener('input',  renderGeneralPreview);
   $(id).addEventListener('change', renderGeneralPreview);
 });
@@ -555,6 +557,7 @@ $('sendBtn').addEventListener('click', async () => {
           channelId:    $('gChannelId').value,
           pingEveryone: $('gPingEveryone').checked,
           header:       $('gHeader').value.trim(),
+          bannerUrl:    $('gBannerUrl').value.trim(),
           footer:       $('gFooter').value.trim(),
           accentColor:  $('gAccentColor').value,
           blocks:       gBlocks,
