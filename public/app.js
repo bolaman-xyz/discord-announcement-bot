@@ -629,6 +629,101 @@ function renderHistoryList() {
   });
 }
 
+// Separate block state for the history editor
+let heBlocks = [];
+let heBlockId = 0;
+
+function heAddBlock(type) {
+  const id = ++heBlockId;
+  const block = { id, type, collapsed: false };
+  if (type === 'text')        block.content = '';
+  if (type === 'section')     { block.text = ''; block.imageUrl = ''; }
+  if (type === 'action_list') block.buttons = [{ label:'', url:'' }];
+  if (type === 'buttons')     block.buttons = [{ label:'', url:'' }];
+  if (type === 'media')       block.urls = [''];
+  if (type === 'file')        { block.url = ''; block.name = ''; }
+  if (type === 'banner')      block.url = '';
+  heBlocks.push(block);
+  renderHeBlocks();
+}
+
+function renderHeBlocks() {
+  const container = $('heBlocksContainer');
+  if (!container) return;
+  container.innerHTML = heBlocks.map((block, idx) => `
+    <div class="block-card" data-hid="${block.id}">
+      <div class="block-header">
+        <span class="block-icon"></span>
+        <span class="block-type-label">${block.type}</span>
+        <div class="block-actions">
+          <button class="block-hbtn" data-hemove="${block.id}" data-dir="-1" ${idx===0?'disabled':''}>↑</button>
+          <button class="block-hbtn" data-hemove="${block.id}" data-dir="1" ${idx===heBlocks.length-1?'disabled':''}>↓</button>
+          <button class="block-hbtn" data-hetoggle="${block.id}">${block.collapsed?'▶':'▼'}</button>
+          <button class="block-hbtn danger" data-hedelete="${block.id}">✕</button>
+        </div>
+      </div>
+      ${block.collapsed ? '' : `<div class="block-body">${renderBlockFields(block)}</div>`}
+    </div>
+  `).join('');
+
+  // Wire up events
+  container.querySelectorAll('[data-hemove]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = +btn.dataset.hemove, dir = +btn.dataset.dir;
+      const i = heBlocks.findIndex(b => b.id === id);
+      if (i + dir < 0 || i + dir >= heBlocks.length) return;
+      [heBlocks[i], heBlocks[i+dir]] = [heBlocks[i+dir], heBlocks[i]];
+      renderHeBlocks();
+    });
+  });
+  container.querySelectorAll('[data-hetoggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const b = heBlocks.find(b => b.id === +btn.dataset.hetoggle);
+      if (b) { b.collapsed = !b.collapsed; renderHeBlocks(); }
+    });
+  });
+  container.querySelectorAll('[data-hedelete]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      heBlocks = heBlocks.filter(b => b.id !== +btn.dataset.hedelete);
+      renderHeBlocks();
+    });
+  });
+  // Reuse same input wiring as main block editor
+  container.querySelectorAll('[data-bid]').forEach(el => {
+    el.addEventListener('input', () => {
+      const b = heBlocks.find(b => b.id === +el.dataset.bid);
+      if (!b) return;
+      const key = el.dataset.key;
+      if (el.dataset.idx !== undefined) {
+        if (!Array.isArray(b[key])) return;
+        const idx = +el.dataset.idx;
+        if (el.dataset.subkey) b[key][idx][el.dataset.subkey] = el.value;
+        else b[key][idx] = el.value;
+      } else {
+        b[key] = el.value;
+      }
+    });
+  });
+  container.querySelectorAll('[data-addbtn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const b = heBlocks.find(b => b.id === +btn.dataset.addbtn);
+      if (b) { b.buttons.push({ label:'', url:'' }); renderHeBlocks(); }
+    });
+  });
+  container.querySelectorAll('[data-rmbtn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const b = heBlocks.find(b => b.id === +btn.dataset.bid);
+      if (b) { b.buttons.splice(+btn.dataset.rmbtn, 1); renderHeBlocks(); }
+    });
+  });
+  container.querySelectorAll('[data-addurl]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const b = heBlocks.find(b => b.id === +btn.dataset.addurl);
+      if (b) { b.urls.push(''); renderHeBlocks(); }
+    });
+  });
+}
+
 function openHistoryEditor(entry) {
   activeEntry = entry;
   renderHistoryList();
@@ -639,19 +734,32 @@ function openHistoryEditor(entry) {
 
   const fields = $('historyEditorFields');
   if (entry.type === 'general') {
+    // Load blocks into editor state
+    heBlocks = JSON.parse(JSON.stringify(entry.data.blocks ?? []));
+    heBlockId = heBlocks.reduce((m, b) => Math.max(m, b.id ?? 0), 0);
+
     fields.innerHTML = `
       <div class="field"><label class="field-label">Header / Title</label><input type="text" id="heHeader" value="${esc(entry.data.header ?? '')}" /></div>
       <div class="field"><label class="field-label">Footer</label><input type="text" id="heFooter" value="${esc(entry.data.footer ?? '')}" /></div>
       <div class="field" style="flex-direction:row;align-items:center;gap:10px">
         <label class="field-label" style="margin:0">Accent color</label>
-        <input type="color" id="heAccent" value="${esc(entry.data.accentColor ?? '#6c63ff')}" />
+        <input type="color" id="heAccent" value="${esc(entry.data.accentColor ?? '#9900ff')}" />
       </div>
-      <div class="field"><label class="field-label">Blocks (read-only summary)</label>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2)">
-          ${(entry.data.blocks ?? []).length} block(s): ${(entry.data.blocks ?? []).map(b => b.type).join(', ') || 'none'}
-          <br><span style="color:var(--text3);font-size:11px">Full block editing coming soon — header, footer and accent can be edited above.</span>
+      <div class="field">
+        <label class="field-label">Blocks</label>
+        <div class="block-toolbar" style="margin-bottom:8px">
+          ${['banner','text','section','action_list','media','file','separator','buttons'].map(t =>
+            `<button class="block-add-btn" data-headd="${t}">+ ${t.replace('_',' ')}</button>`
+          ).join('')}
         </div>
+        <div id="heBlocksContainer"></div>
       </div>`;
+
+    // Wire toolbar
+    fields.querySelectorAll('[data-headd]').forEach(btn => {
+      btn.addEventListener('click', () => heAddBlock(btn.dataset.headd));
+    });
+    renderHeBlocks();
   } else {
     fields.innerHTML = `
       <div class="field"><label class="field-label">Product</label><input type="text" id="heProduct" value="${esc(entry.data.product ?? '')}" /></div>
@@ -683,6 +791,7 @@ $('saveEditBtn').addEventListener('click', async () => {
       header: $('heHeader')?.value.trim() ?? d.header,
       footer: $('heFooter')?.value.trim() ?? d.footer,
       accentColor: $('heAccent')?.value ?? d.accentColor,
+      blocks: heBlocks,
     };
   } else {
     updatedData = {
