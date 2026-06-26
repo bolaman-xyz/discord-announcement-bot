@@ -189,6 +189,28 @@
 
 </div>
 
+<!-- Mobile bottom nav -->
+<nav id="mobile-nav">
+  <button class="mob-nav-btn active" data-tab="build">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Build
+  </button>
+  <button class="mob-nav-btn" data-tab="general">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    General
+  </button>
+  <button class="mob-nav-btn" data-tab="settings">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- Floating preview button (mobile only) -->
+<button id="previewFab" style="display:none">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+  Preview
+</button>
+
 <div id="toast"></div>
 <div id="overlay"><div class="spinner"></div><span style="color:#e2e4ec;font-size:13px;font-weight:500">Sending…</span></div>
 

@@ -30,8 +30,22 @@ async function api(path, opts={}) {
 }
 
 // ── Navigation ─────────────────────────────────────────────────────────────
+function isMobile() { return window.innerWidth <= 700; }
+
+function closePreviewSheet() {
+  document.querySelectorAll('.preview-wrap').forEach(pw => pw.classList.remove('open'));
+  const fab = $('previewFab');
+  if (fab) { fab.textContent = ''; fab.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Preview'; }
+}
+
+function openPreviewSheet(panelId) {
+  const pw = document.querySelector(`#${panelId} .preview-wrap`);
+  if (pw) pw.classList.add('open');
+}
+
 function switchTab(tab) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
   $('buildPanel').classList.toggle('active', tab==='build');
   $('generalPanel').classList.toggle('active', tab==='general');
   $('settingsPanel').classList.toggle('active', tab==='settings');
@@ -40,8 +54,49 @@ function switchTab(tab) {
   $('topbarActions').style.display = (tab==='build'||tab==='general') ? '' : 'none';
   $('sendBtn').dataset.tab = tab;
   $('resetBtn').style.display = tab==='general' ? 'none' : '';
+
+  // Mobile: show/hide FAB
+  const fab = $('previewFab');
+  if (fab) fab.style.display = (isMobile() && (tab==='build'||tab==='general')) ? 'flex' : 'none';
+  closePreviewSheet();
 }
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', ()=>switchTab(b.dataset.tab)));
+document.querySelectorAll('.mob-nav-btn').forEach(b => b.addEventListener('click', ()=>switchTab(b.dataset.tab)));
+
+// Preview FAB
+const previewFab = $('previewFab');
+if (previewFab) {
+  previewFab.addEventListener('click', () => {
+    const activeTab = document.querySelector('.mob-nav-btn.active')?.dataset.tab;
+    const panelMap = { build: 'buildPanel', general: 'generalPanel' };
+    const panelId = panelMap[activeTab];
+    if (!panelId) return;
+    const pw = document.querySelector(`#${panelId} .preview-wrap`);
+    if (!pw) return;
+    if (pw.classList.contains('open')) {
+      closePreviewSheet();
+    } else {
+      openPreviewSheet(panelId);
+    }
+  });
+}
+
+// Preview close buttons (injected on mobile)
+function ensurePreviewClose() {
+  document.querySelectorAll('.preview-wrap').forEach(pw => {
+    if (!pw.querySelector('.preview-close')) {
+      const hdr = pw.querySelector('.preview-header');
+      if (hdr) {
+        const btn = document.createElement('button');
+        btn.className = 'preview-close';
+        btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Close';
+        btn.addEventListener('click', closePreviewSheet);
+        hdr.appendChild(btn);
+      }
+    }
+  });
+}
+ensurePreviewClose();
 
 // ── Status dot sync ────────────────────────────────────────────────────────
 function syncStatusDot() {

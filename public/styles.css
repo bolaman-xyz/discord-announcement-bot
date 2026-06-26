@@ -594,27 +594,175 @@ input[type=color] {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Desktop: hide mobile-only elements ── */
+#mobile-nav { display: none; }
+#previewFab { display: none; }
+.preview-close { display: none; }
+
 /* ── Mobile ── */
 @media (max-width: 700px) {
-  html, body { overflow: auto; }
+  html, body { overflow: hidden; height: 100%; height: 100dvh; }
   body { flex-direction: column; }
-  #sidebar { width: 100%; min-width: unset; height: auto; flex-direction: row; align-items: center; border-right: none; border-bottom: 1px solid var(--border); padding: 10px 14px; gap: 10px; }
-  .brand { padding: 0; border-bottom: none; display: flex; align-items: center; gap: 8px; }
-  .brand-icon { width: 26px; height: 26px; font-size: 12px; flex-shrink: 0; }
-  .brand-sub { display: none; }
-  .nav { flex-direction: row; padding: 0; gap: 4px; flex: unset; }
-  .nav-section { display: none; }
-  .nav-btn { padding: 6px 10px; font-size: 12px; }
-  .bot-status { margin-top: 0; margin-left: auto; border-top: none; padding: 0; font-size: 11px; }
-  #main { height: auto; overflow: visible; }
-  .page { overflow: visible; }
-  .page.active { flex-direction: column; }
-  #buildPanel { flex-direction: column; }
-  .form-panel { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); padding: 14px; }
-  .preview-wrap { min-height: 420px; }
-  #settingsPanel { padding: 14px; }
+
+  /* Hide desktop sidebar */
+  #sidebar { display: none; }
+
+  /* Bottom nav bar */
+  #mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 62px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mob-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text3);
+    font-size: 10px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color .15s;
+    padding: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .mob-nav-btn.active { color: var(--accent2); }
+  .mob-nav-btn svg { width: 20px; height: 20px; }
+
+  /* Main area fills screen minus topbar and bottom nav */
+  #main {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Topbar */
+  .topbar {
+    padding: 0 16px;
+    height: 52px;
+    flex-shrink: 0;
+  }
+  .topbar h1 { font-size: 15px; }
+  .topbar-sub { display: none; }
+  #topbarActions { gap: 6px; }
+  #resetBtn { display: none; }
+  .btn { padding: 8px 16px; font-size: 13px; border-radius: 10px; }
+  .btn.primary { min-width: 72px; justify-content: center; }
+
+  /* Pages fill remaining space */
+  .page { overflow: hidden; height: 100%; }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* Build + General: form takes full width, preview hidden behind sheet */
+  #buildPanel, #generalPanel { flex-direction: column; position: relative; }
+
+  .form-panel {
+    width: 100% !important;
+    min-width: unset !important;
+    border-right: none;
+    border-bottom: none;
+    padding: 16px 16px 80px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Preview sheet — slides up from bottom */
+  .preview-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.32,.72,0,1);
+    padding-bottom: 62px;
+  }
+  .preview-wrap.open { transform: translateY(0); }
+
+  .preview-header {
+    height: 52px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .preview-close {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* Floating preview button */
+  #previewFab {
+    display: flex;
+    position: fixed;
+    bottom: 74px;
+    right: 16px;
+    z-index: 100;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 9px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    gap: 6px;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Settings */
+  #settingsPanel {
+    flex-direction: column;
+    padding: 16px 16px 80px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   .settings-card { max-width: 100%; }
-  .topbar { padding: 0 14px; height: 50px; }
-  .topbar h1 { font-size: 14px; }
-  .btn { padding: 6px 12px; font-size: 12px; }
+
+  /* Block toolbar wraps nicely */
+  .block-toolbar { gap: 6px; }
+  .block-add-btn { font-size: 12px; padding: 7px 10px; }
+
+  /* Bigger tap targets for inputs */
+  input:not([type=checkbox]):not([type=color]),
+  select, textarea { font-size: 16px; padding: 11px 13px; } /* 16px prevents iOS zoom */
+  .field-label { font-size: 12px; }
+  .check-row { font-size: 14px; gap: 10px; }
+  .check-row input[type=checkbox] { width: 18px; height: 18px; }
+
+  /* Block cards */
+  .block-hbtn { padding: 6px 10px; font-size: 13px; }
+  .btn-row-fields { grid-template-columns: 1fr; gap: 6px; }
+  .btn-row-fields button { justify-self: end; }
+
+  /* Row2 stacks */
+  .row2 { grid-template-columns: 1fr auto; }
 }
