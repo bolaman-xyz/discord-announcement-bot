@@ -1,9 +1,29 @@
+const fs = require('node:fs');
+const path = require('node:path');
 const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
 const { buildAnnouncementComponents, LANG_BUTTONS } = require('./announcement');
 const { ensureFlagEmojis, readCache, isComplete } = require('./flag-emojis');
 const { loadSettings } = require('./settings');
 
-const announcementStore = new Map();
+const STORE_PATH = path.join(__dirname, '..', 'data', 'announcements.json');
+
+function loadStore() {
+  try {
+    const raw = fs.readFileSync(STORE_PATH, 'utf8');
+    return new Map(Object.entries(JSON.parse(raw)));
+  } catch {
+    return new Map();
+  }
+}
+
+function saveStore(map) {
+  try {
+    fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
+    fs.writeFileSync(STORE_PATH, JSON.stringify(Object.fromEntries(map)));
+  } catch {}
+}
+
+const announcementStore = loadStore();
 
 let client = null;
 let currentToken = null;
@@ -193,6 +213,7 @@ async function sendAnnouncement(channelId, data) {
   const payload = buildAnnouncementComponents(data, 'en', emojis);
   const message = await channel.send(payload);
   announcementStore.set(message.id, data);
+  saveStore(announcementStore);
 
   return {
     messageId: message.id,
