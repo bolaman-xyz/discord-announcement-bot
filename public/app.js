@@ -154,7 +154,6 @@ function renderPreview() {
               <div class="cv2-section" style="padding-top:8px">
                 <div class="cv2-section-label">Current Status</div>
                 <div class="cv2-section-box">
-                  <span class="cv2-dot" style="background:${sc}"></span>
                   ${emoji} ${sLabel}
                 </div>
               </div>
@@ -172,12 +171,10 @@ function renderPreview() {
               ${bannerHtml}
               ${d.footer ? `<div class="cv2-text" style="padding-top:6px;font-size:12px;color:#80848e">${esc(d.footer)}</div>` : ''}
 
-            </div>
-          </div>
-          <div class="cv2-footer-bar">
-            <span>${esc(d.footer)}</span>
-            <div class="flag-row">
-              ${['us','de','fr','es','br'].map(c => `<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}
+              <div class="flag-row" style="padding-top:8px">
+                ${['us','de','fr','es','br'].map(c => `<div class="flag-btn"><img src="https://flagcdn.com/w40/${c}.png" alt="${c}"></div>`).join('')}
+              </div>
+
             </div>
           </div>
         </div>
