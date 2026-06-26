@@ -305,12 +305,6 @@ async function buildGeneralPayload(data, emojis) {
   if (data.footer?.trim())
     container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# ${data.footer.trim()}`));
 
-  container.addActionRowComponents(
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setLabel('Website').setURL('https://odservices.cc/').setStyle(ButtonStyle.Link).setEmoji('🔗'),
-    ),
-  );
-
   if (emojis && Object.keys(emojis).length) {
     const { LANG_BUTTONS } = require('./announcement');
     const flagRow = new ActionRowBuilder().addComponents(
@@ -324,10 +318,15 @@ async function buildGeneralPayload(data, emojis) {
     container.addActionRowComponents(flagRow);
   }
 
+  const websiteRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setLabel('Website').setURL('https://odservices.cc/').setStyle(ButtonStyle.Link).setEmoji('🔗'),
+  );
+
   const components = [];
   if (data.pingEveryone) components.push(new TextDisplayBuilder().setContent('@everyone'));
   components.push(container);
   belowComponents.forEach(c => components.push(c));
+  components.push(websiteRow);
 
   return { components, flags: MessageFlags.IsComponentsV2 };
 }
