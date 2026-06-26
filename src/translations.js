@@ -1,5 +1,5 @@
 const STATUS_LABELS = {
-  UNDETECTED: { emoji: '🟢', en: 'UNDETECTED', de: 'UNENTDECKT', fr: 'INDÉTECTÉ', es: 'INDETECTABLE', pt: 'INDETECTÁVEL' },
+  UNDETECTED: { emoji: '🟢', en: 'UPDATED', de: 'AKTUALISIERT', fr: 'MIS À JOUR', es: 'ACTUALIZADO', pt: 'ATUALIZADO' },
   DETECTED: { emoji: '🔴', en: 'DETECTED', de: 'ENTDECKT', fr: 'DÉTECTÉ', es: 'DETECTADO', pt: 'DETECTADO' },
   UPDATING: { emoji: '🟡', en: 'UPDATING', de: 'WIRD AKTUALISIERT', fr: 'MISE À JOUR', es: 'ACTUALIZANDO', pt: 'ATUALIZANDO' },
   MAINTENANCE: { emoji: '🟠', en: 'MAINTENANCE', de: 'WARTUNG', fr: 'MAINTENANCE', es: 'MANTENIMIENTO', pt: 'MANUTENÇÃO' },
