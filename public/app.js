@@ -485,26 +485,23 @@ async function refreshBotStatus() {
 }
 
 // ── Channels ───────────────────────────────────────────────────────────────
+function populateChannelSelect(selEl, channels, storageKey) {
+  const saved = localStorage.getItem(storageKey) || selEl.value;
+  selEl.innerHTML = '<option value="">Select a channel…</option>';
+  channels.forEach(ch => {
+    const o = document.createElement('option');
+    o.value = ch.id; o.textContent = '#' + ch.name;
+    selEl.appendChild(o);
+  });
+  if (saved) selEl.value = saved;
+  selEl.addEventListener('change', () => localStorage.setItem(storageKey, selEl.value));
+}
+
 async function loadChannels() {
   try {
     const { channels } = await api('/api/channels');
-    const sel = $('channelId'), cur = sel.value;
-    sel.innerHTML = '<option value="">Select a channel…</option>';
-    channels.forEach(ch => {
-      const o = document.createElement('option');
-      o.value = ch.id; o.textContent = '#' + ch.name;
-      sel.appendChild(o);
-    });
-    if (cur) sel.value = cur;
-
-    const gSel = $('gChannelId'), gCur = gSel.value;
-    gSel.innerHTML = '<option value="">Select a channel…</option>';
-    channels.forEach(ch => {
-      const o = document.createElement('option');
-      o.value = ch.id; o.textContent = '#' + ch.name;
-      gSel.appendChild(o);
-    });
-    if (gCur) gSel.value = gCur;
+    populateChannelSelect($('channelId'),  channels, 'ch_build');
+    populateChannelSelect($('gChannelId'), channels, 'ch_general');
   } catch (e) {
     showToast(e.message, 'error');
   }
