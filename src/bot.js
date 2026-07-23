@@ -238,7 +238,7 @@ async function buildGeneralPayload(data, emojis) {
     ActionRowBuilder, ButtonBuilder, ButtonStyle, FileBuilder, MessageFlags,
   } = require('discord.js');
 
-  const color = parseInt((data.accentColor ?? '#9900ff').replace('#', ''), 16);
+  const color = parseInt((process.env.ACCENT_COLOR ?? data.accentColor ?? '#9900ff').replace('#', ''), 16);
   const container = new ContainerBuilder().setAccentColor(color);
   const belowButtons = []; // all below-container link buttons collected here
 

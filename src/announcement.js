@@ -32,7 +32,7 @@ function buildAnnouncementComponents(data, lang = 'en', flagEmojis = {}) {
   const statusText = getStatusText(data.status, lang);
 
   const container = new ContainerBuilder()
-    .setAccentColor(parseInt(data.accentColor.replace('#', ''), 16))
+    .setAccentColor(parseInt((process.env.ACCENT_COLOR ?? data.accentColor).replace('#', ''), 16))
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`## ${t.title}`),
       new TextDisplayBuilder().setContent(fieldBlock(t.product, data.product)),
