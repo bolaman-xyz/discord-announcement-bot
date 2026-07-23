@@ -99,7 +99,7 @@ app.post('/api/announce', async (req, res) => {
     const data = {
       product: req.body.product ?? settings.defaults.product,
       status: req.body.status ?? settings.defaults.status,
-      statusUrl: req.body.statusUrl ?? settings.defaults.statusUrl,
+      statusUrl: process.env.STATUS_URL ?? req.body.statusUrl ?? settings.defaults.statusUrl,
       changelog: req.body.changelog ?? settings.defaults.changelog,
       imageUrl: req.body.imageUrl ?? settings.defaults.imageUrl,
       footer: req.body.footer ?? settings.defaults.footer,
